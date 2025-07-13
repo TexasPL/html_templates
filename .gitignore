@@ -1,0 +1,9 @@
+test_slides/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.env
+screenshot_*.png
+*.log
