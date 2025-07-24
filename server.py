@@ -60,13 +60,443 @@ class SlideScreenshotApp:
         def serve_number():
             try:
                 with open('number.txt', 'r') as f:
-                    return f.read()
+                    content = f.read()
+                    print(f"[SERVER] Serwowanie number.txt: '{content}'")
+                    return content
             except FileNotFoundError:
+                print("[SERVER] BŁĄD: number.txt nie znaleziono, zwracam domyślną wartość 3")
                 return "3"
                 
         @self.flask_app.route('/slides/<path:filename>')
         def serve_slide_static(filename):
             return send_from_directory('slides', filename)
+        
+        @self.flask_app.route('/img_slides/<path:filename>')
+        def serve_img_slide_static(filename):
+            return send_from_directory('img_slides', filename)
+        
+        @self.flask_app.route('/slides/<path:slide_dir>/<path:filename>')
+        def serve_slide_assets(slide_dir, filename):
+            if slide_dir.startswith('p') and slide_dir[1:].isdigit():
+                return send_from_directory(f'slides/{slide_dir}', filename)
+            else:
+                return "Not found", 404
+        
+        @self.flask_app.route('/templates/<path:filename>')
+        def serve_template_static(filename):
+            return send_from_directory('templates', filename)
+        
+        @self.flask_app.route('/api/template-images')
+        def get_template_images():
+            try:
+                import os
+                img_dir = 'img_slides'
+                print(f"[API] Sprawdzam katalog: {img_dir}")
+                if not os.path.exists(img_dir):
+                    print(f"[API] Katalog {img_dir} nie istnieje")
+                    return jsonify({'images': []})
+                
+                images = []
+                for filename in os.listdir(img_dir):
+                    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                        images.append(filename)
+                
+                print(f"[API] Znaleziono {len(images)} obrazów: {images[:5]}...")
+                return jsonify({'images': sorted(images)})
+            except Exception as e:
+                print(f"[API] Błąd template-images: {str(e)}")
+                return jsonify({'error': str(e)}), 500
+        
+        @self.flask_app.route('/api/create-slide', methods=['POST'])
+        def create_slide():
+            try:
+                from slide_generator import SlideGenerator
+                from flask import request
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                preset = data.get('preset', 'preset-1')
+                header = data.get('header', 'Nagłówek')
+                content = data.get('content', 'Treść slajdu')
+                image = data.get('image', None)
+                
+                generator = SlideGenerator()
+                
+                # Przygotuj dane obrazów
+                images = {}
+                if image:
+                    images['green'] = image
+                
+                # Przygotuj teksty
+                custom_texts = {
+                    'header': header,
+                    'content': content
+                }
+                
+                # Utwórz slajd
+                slide_number = generator.create_slide(preset, images, custom_texts)
+                
+                print(f"Utworzono slajd przez API: s{slide_number}.html")
+                
+                return jsonify({
+                    'success': True, 
+                    'slide_number': slide_number,
+                    'message': f'Slajd {slide_number} został utworzony'
+                })
+                
+            except Exception as e:
+                print(f"Błąd tworzenia slajdu: {str(e)}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.flask_app.route('/api/presets/<path:filename>')
+        def serve_preset(filename):
+            return send_from_directory('templates/presets', filename)
+        
+        @self.flask_app.route('/api/save-preset', methods=['POST'])
+        def save_preset():
+            try:
+                from flask import request
+                import json
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                preset_number = data.get('presetNumber')
+                preset_data = data.get('presetData')
+                
+                if not preset_number or not preset_data:
+                    return jsonify({'success': False, 'error': 'Nieprawidłowe dane'}), 400
+                
+                # Zapisz preset do pliku
+                preset_filename = f'preset-{preset_number}.json'
+                preset_path = os.path.join('templates/presets', preset_filename)
+                
+                with open(preset_path, 'w', encoding='utf-8') as f:
+                    json.dump(preset_data, f, indent=4, ensure_ascii=False)
+                
+                print(f"Zapisano preset: {preset_filename}")
+                
+                return jsonify({
+                    'success': True,
+                    'message': f'Preset {preset_number} został zapisany',
+                    'filename': preset_filename
+                })
+                
+            except Exception as e:
+                print(f"Błąd zapisu presetu: {str(e)}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.flask_app.route('/api/delete-preset', methods=['POST'])
+        def delete_preset():
+            try:
+                from flask import request
+                import os
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                preset_number = data.get('presetNumber')
+                
+                if not preset_number:
+                    return jsonify({'success': False, 'error': 'Nie podano numeru presetu'}), 400
+                
+                # Usuń walidację preset 1 - teraz można usunąć każdy preset
+                
+                # Usuń plik presetu
+                preset_filename = f'preset-{preset_number}.json'
+                preset_path = os.path.join('templates/presets', preset_filename)
+                
+                if os.path.exists(preset_path):
+                    os.remove(preset_path)
+                    print(f"Usunięto preset: {preset_filename}")
+                    
+                    return jsonify({
+                        'success': True,
+                        'message': f'Preset {preset_number} został usunięty'
+                    })
+                else:
+                    return jsonify({'success': False, 'error': 'Plik presetu nie istnieje'}), 404
+                
+            except Exception as e:
+                print(f"Błąd usuwania presetu: {str(e)}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        @self.flask_app.route('/api/available-presets')
+        def get_available_presets():
+            try:
+                import os
+                presets_dir = 'templates/presets'
+                presets = []
+                
+                if os.path.exists(presets_dir):
+                    for filename in os.listdir(presets_dir):
+                        if filename.startswith('preset-') and filename.endswith('.json'):
+                            # Wyciągnij numer presetu z nazwy pliku
+                            preset_num = filename.replace('preset-', '').replace('.json', '')
+                            try:
+                                presets.append(int(preset_num))
+                            except ValueError:
+                                continue
+                
+                return jsonify({'presets': sorted(presets)})
+            except Exception as e:
+                print(f"Błąd pobierania dostępnych presetów: {str(e)}")
+                return jsonify({'presets': []})
+        
+        @self.flask_app.route('/api/export-slide', methods=['POST'])
+        def export_slide():
+            try:
+                from flask import request
+                import json
+                import os
+                import shutil
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                # Znajdź następny numer katalogu p{n}
+                slides_dir = 'slides'
+                if not os.path.exists(slides_dir):
+                    os.makedirs(slides_dir)
+                
+                next_num = 1
+                existing_dirs = [d for d in os.listdir(slides_dir) if d.startswith('p') and d[1:].isdigit()]
+                if existing_dirs:
+                    existing_nums = [int(d[1:]) for d in existing_dirs]
+                    next_num = max(existing_nums) + 1
+                
+                export_dir = os.path.join(slides_dir, f'p{next_num}')
+                os.makedirs(export_dir, exist_ok=True)
+                
+                # Skopiuj obrazy jeśli są używane
+                images_to_copy = []
+                if data['green']['image']:
+                    images_to_copy.append(data['green']['image'])
+                if data['orange']['image']:
+                    images_to_copy.append(data['orange']['image'])
+                
+                for image_name in images_to_copy:
+                    src_path = os.path.join('img_slides', image_name)
+                    dst_path = os.path.join(export_dir, image_name)
+                    if os.path.exists(src_path):
+                        shutil.copy2(src_path, dst_path)
+                
+                # Generuj HTML
+                html_content = generate_slide_html(data, f'p{next_num}')
+                
+                # Zapisz HTML
+                html_path = os.path.join(export_dir, 's1.html')
+                with open(html_path, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                
+                return jsonify({
+                    'success': True,
+                    'path': f'slides/p{next_num}/s1.html',
+                    'directory': f'p{next_num}',
+                    'message': f'Slajd wyeksportowany do {export_dir}'
+                })
+                
+            except Exception as e:
+                return jsonify({'success': False, 'error': str(e)}), 500
+        
+        def generate_slide_html(data, slide_dir):
+            # Pomocnicze funkcje
+            def get_border_radius(element_data):
+                if element_data.get('circle'):
+                    return '50%'
+                elif element_data.get('rounded'):
+                    w, h = element_data['w'], element_data['h']
+                    radius = min(w, h) * 0.05
+                    return f'{radius}px'
+                return '0px'
+            
+            def get_text_decoration(styles):
+                return 'underline' if styles.get('underline') else 'none'
+            
+            def get_font_weight(styles):
+                return 'bold' if styles.get('bold') else 'normal'
+            
+            def get_font_style(styles):
+                return 'italic' if styles.get('italic') else 'normal'
+            
+            def get_background_image(image_name, zoom):
+                if image_name:
+                    return f"background-image: url('slides/{slide_dir}/{image_name}'); background-size: {zoom}%; background-position: center; background-repeat: no-repeat;"
+                return ""
+            
+            # Generuj style CSS
+            styles = f"""
+                body {{
+                    margin: 0;
+                    padding: 0;
+                    background-color: {data['slide']['backgroundColor']};
+                    font-family: Arial, sans-serif;
+                }}
+                .container {{
+                    width: 1536px;
+                    height: 864px;
+                    position: relative;
+                    margin: 0 auto;
+                    background-color: {data['slide']['backgroundColor']};
+                }}
+            """
+            
+            # Green box
+            if not data['green']['hidden']:
+                styles += f"""
+                .green-box {{
+                    position: absolute;
+                    left: {data['green']['x']}px;
+                    top: {data['green']['y']}px;
+                    width: {data['green']['w']}px;
+                    height: {data['green']['h']}px;
+                    background-color: #81c784;
+                    border-radius: {get_border_radius(data['green'])};
+                    {get_background_image(data['green']['image'], data['green']['zoom'])}
+                }}
+                """
+                
+                # Green caption
+                if data['green']['captionEnabled'] and data['green']['captionText']:
+                    caption_x = data['green']['x'] + data['green']['w'] // 2
+                    caption_y = data['green']['y'] + data['green']['h'] + 10
+                    styles += f"""
+                    .green-caption {{
+                        position: absolute;
+                        left: {caption_x}px;
+                        top: {caption_y}px;
+                        transform: translateX(-50%);
+                        font-size: {data['green']['captionSize']}px;
+                        background-color: {data['green']['captionBackgroundColor']};
+                        color: {data['green']['captionColor']};
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-family: {data['content']['fontFamily']};
+                    }}
+                    """
+            
+            # Orange box  
+            if not data['orange']['hidden']:
+                styles += f"""
+                .orange-box {{
+                    position: absolute;
+                    left: {data['orange']['x']}px;
+                    top: {data['orange']['y']}px;
+                    width: {data['orange']['w']}px;
+                    height: {data['orange']['h']}px;
+                    background-color: #ff9800;
+                    border-radius: {get_border_radius(data['orange'])};
+                    {get_background_image(data['orange']['image'], data['orange']['zoom'])}
+                }}
+                """
+                
+                # Orange caption
+                if data['orange']['captionEnabled'] and data['orange']['captionText']:
+                    caption_x = data['orange']['x'] + data['orange']['w'] // 2
+                    caption_y = data['orange']['y'] + data['orange']['h'] + 10
+                    styles += f"""
+                    .orange-caption {{
+                        position: absolute;
+                        left: {caption_x}px;
+                        top: {caption_y}px;
+                        transform: translateX(-50%);
+                        font-size: {data['orange']['captionSize']}px;
+                        background-color: {data['orange']['captionBackgroundColor']};
+                        color: {data['orange']['captionColor']};
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        font-family: {data['content']['fontFamily']};
+                    }}
+                    """
+            
+            # Header
+            if not data['header']['hidden']:
+                styles += f"""
+                .header {{
+                    position: absolute;
+                    left: {data['header']['x']}px;
+                    top: {data['header']['y']}px;
+                    font-size: {data['header']['fontSize']}px;
+                    font-family: {data['header']['fontFamily']};
+                    font-weight: {get_font_weight(data['header'])};
+                    font-style: {get_font_style(data['header'])};
+                    text-decoration: {get_text_decoration(data['header'])};
+                    background-color: {data['header']['backgroundColor']};
+                    color: {data['header']['color']};
+                    padding-left: {data['header']['marginLeft']}px;
+                    padding-right: {data['header']['marginRight']}px;
+                    padding-top: 8px;
+                    padding-bottom: 8px;
+                    display: inline-block;
+                }}
+                """
+            
+            # Content
+            if not data['content']['hidden']:
+                styles += f"""
+                .content {{
+                    position: absolute;
+                    left: {data['content']['x']}px;
+                    top: {data['content']['y']}px;
+                    font-size: {data['content']['fontSize']}px;
+                    font-family: {data['content']['fontFamily']};
+                    font-weight: {get_font_weight(data['content'])};
+                    font-style: {get_font_style(data['content'])};
+                    text-decoration: {get_text_decoration(data['content'])};
+                    background-color: {data['content']['backgroundColor']};
+                    color: {data['content']['color']};
+                    padding-left: {data['content']['marginLeft']}px;
+                    padding-right: {data['content']['marginRight']}px;
+                    padding-top: 8px;
+                    padding-bottom: 8px;
+                    display: inline-block;
+                    white-space: pre-wrap;
+                    line-height: 1.2;
+                }}
+                """
+            
+            # Generuj HTML
+            html_body = '<div class="container">'
+            
+            # Dodaj elementy
+            if not data['green']['hidden']:
+                html_body += '<div class="green-box"></div>'
+                if data['green']['captionEnabled'] and data['green']['captionText']:
+                    html_body += f'<div class="green-caption">{data["green"]["captionText"]}</div>'
+            
+            if not data['orange']['hidden']:
+                html_body += '<div class="orange-box"></div>'
+                if data['orange']['captionEnabled'] and data['orange']['captionText']:
+                    html_body += f'<div class="orange-caption">{data["orange"]["captionText"]}</div>'
+            
+            if not data['header']['hidden']:
+                html_body += f'<div class="header">{data["header"]["text"]}</div>'
+            
+            if not data['content']['hidden']:
+                html_body += f'<div class="content">{data["content"]["text"]}</div>'
+            
+            html_body += '</div>'
+            
+            # Kompletny HTML
+            return f"""<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksportowany slajd</title>
+    <style>
+        {styles}
+    </style>
+</head>
+<body>
+    {html_body}
+</body>
+</html>"""
             
         @self.flask_app.route('/<path:filename>')
         def serve_static(filename):
@@ -81,7 +511,6 @@ class SlideScreenshotApp:
                 self.capture_screenshot(current_slide)
                 return jsonify({"status": "success", "message": f"Screenshot slajdu {current_slide} zapisany"})
             except Exception as e:
-                print(f"BŁĄD screenshot: {str(e)}")
                 return jsonify({"status": "error", "message": str(e)})
     
     def ensure_driver_ready(self):
@@ -115,13 +544,20 @@ class SlideScreenshotApp:
         
         try:
             # Przejdź do odpowiedniego slajdu
-            if slide_number != '1':
+            if slide_number.startswith('p'):
+                # Slajd z katalogu p{n}
+                self.driver.execute_script(f"""
+                    loadSlideFromP1();
+                """)
+                time.sleep(0.2)
+            elif slide_number != '1':
+                # Normalny slajd
                 self.driver.execute_script(f"""
                     // Symuluj przejście do slajdu {slide_number}
                     currentSlide = {slide_number};
                     loadSlide(currentSlide);
                 """)
-                time.sleep(0.2)  # Skrócone z 0.5s
+                time.sleep(0.2)
             
             # Wymuszenie dokładnych rozmiarów
             self.driver.execute_script("""
@@ -197,16 +633,24 @@ class SlideScreenshotApp:
             timestamp = int(time.time())
             filename = f'screenshot_slide_{slide_number}_{timestamp}.png'
             final_img.save(filename, 'PNG')
-            print(f"Screenshot zapisany: {filename}")
             
         except Exception as e:
-            print(f"BŁĄD capture_screenshot: {str(e)}")
             # Nie zamykaj drivera - zostanie persistent
             raise
     
     def start_server(self):
         import logging
         from werkzeug.serving import WSGIRequestHandler
+        
+        print(f"[SERVER] Uruchamiam serwer na porcie {self.port}")
+        
+        # Sprawdź zawartość number.txt przy starcie
+        try:
+            with open('number.txt', 'r') as f:
+                content = f.read()
+                print(f"[SERVER] Zawartość number.txt przy starcie: '{content}'")
+        except FileNotFoundError:
+            print("[SERVER] OSTRZEŻENIE: number.txt nie istnieje przy starcie")
         
         # Własny handler który blokuje tylko request logi
         class QuietWSGIRequestHandler(WSGIRequestHandler):

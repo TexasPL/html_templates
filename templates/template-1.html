@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Szablon 1 - Układ asymetryczny</title>
+    <link rel="stylesheet" href="template-1.css">
+</head>
+<body>
+    <div class="body-wrapper">
+        <div class="container">
+            <div class="image-top-right" id="greenBox"></div>
+            <div class="image-bottom-left" id="orangeBox"></div>
+            <div class="caption" id="greenCaption" contenteditable="true" style="display: none;">Podpis</div>
+            <div class="caption" id="orangeCaption" contenteditable="true" style="display: none;">Podpis</div>
+            <div class="text-header" id="textHeader" contenteditable="true" data-placeholder="Nagłówek">Nagłówek</div>
+            <div class="text-content" id="textContent" contenteditable="true" data-placeholder="Treść slajdu">Treść slajdu</div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="image-popup" id="imagePopup">
+        <h3>Wybierz obraz</h3>
+        <div class="image-grid" id="imageGrid"></div>
+        <div class="popup-buttons">
+            <button class="popup-btn popup-btn-cancel" onclick="closeImagePopup()">Anuluj</button>
+            <button class="popup-btn popup-btn-ok" onclick="selectImage()">Wybierz</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="colorPopupOverlay"></div>
+    <div class="image-popup" id="colorPopup">
+        <h3 id="colorPopupTitle">Wybierz kolory</h3>
+        <div class="color-controls">
+            <div class="control-row">
+                <label>Kolor tła:</label>
+                <input type="color" id="popupBackgroundColor" value="#ffeb3b">
+            </div>
+            <div class="control-row">
+                <label>Kolor tekstu:</label>
+                <input type="color" id="popupTextColor" value="#000000">
+            </div>
+        </div>
+        <div class="popup-buttons">
+            <button class="popup-btn popup-btn-cancel" onclick="closeColorPopup()">Anuluj</button>
+            <button class="popup-btn popup-btn-ok" onclick="applyColors()">Zastosuj</button>
+        </div>
+    </div>
+        
+    <div class="control-panel">
+        <div class="control-group green-controls">
+            <h3>Zielone pole
+                <label class="visibility-control">
+                    <input type="checkbox" id="greenHidden" onchange="toggleGreenVisibility()">
+                    Ukryj
+                </label>
+            </h3>
+            <div class="control-row">
+                <label>Szerokość:</label>
+                <input type="range" id="greenWidth" min="100" max="1400" value="922">
+                <span class="value" id="greenWidthValue">922px</span>
+            </div>
+            <div class="control-row">
+                <label>Wysokość:</label>
+                <input type="range" id="greenHeight" min="100" max="800" value="778">
+                <span class="value" id="greenHeightValue">778px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja X:</label>
+                <input type="range" id="greenPosX" min="0" max="1436" value="0">
+                <span class="value" id="greenPosXValue">0px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja Y:</label>
+                <input type="range" id="greenPosY" min="0" max="764" value="0">
+                <span class="value" id="greenPosYValue">0px</span>
+            </div>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setGreenPreset(2, 3)">2:3</button>
+                <button class="preset-btn" onclick="setGreenPreset(3, 2)">3:2</button>
+                <button class="preset-btn" onclick="setGreenPreset(4, 3)">4:3</button>
+                <button class="preset-btn" onclick="setGreenPreset(3, 4)">3:4</button>
+                <button class="preset-btn" onclick="setGreenPreset(16, 9)">16:9</button>
+                <label class="visibility-control">
+                    <input type="checkbox" id="greenRounded" onchange="toggleGreenRounded()">
+                    Zaokrąglij
+                </label>
+                <label class="visibility-control">
+                    <input type="checkbox" id="greenLockRatio" onchange="toggleGreenLockRatio()" disabled>
+                    Blokuj
+                </label>
+                <label class="visibility-control">
+                    <input type="checkbox" id="greenCircle" onchange="toggleGreenCircle()">
+                    Koło
+                </label>
+            </div>
+            <div class="control-row">
+                <label>Zoom img:</label>
+                <input type="range" id="greenZoom" min="50" max="200" value="100" disabled>
+                <button class="preset-btn" id="greenRemoveImg" onclick="removeGreenImage()" disabled>Usuń img</button>
+            </div>
+            <div class="control-row">
+                <label class="visibility-control">
+                    <input type="checkbox" id="greenCaptionCheck" onchange="toggleGreenCaption()">
+                    Podpis
+                </label>
+                <input type="range" id="greenCaptionSize" min="8" max="50" value="12" disabled>
+                <span class="value" id="greenCaptionSizeValue">12px</span>
+            </div>
+        </div>
+
+        <div class="control-group orange-controls">
+            <h3>Pomarańczowe pole
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeHidden" onchange="toggleOrangeVisibility()">
+                    Ukryj
+                </label>
+            </h3>
+            <div class="control-row">
+                <label>Szerokość:</label>
+                <input type="range" id="orangeWidth" min="100" max="1400" value="538">
+                <span class="value" id="orangeWidthValue">538px</span>
+            </div>
+            <div class="control-row">
+                <label>Wysokość:</label>
+                <input type="range" id="orangeHeight" min="100" max="800" value="346">
+                <span class="value" id="orangeHeightValue">346px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja X:</label>
+                <input type="range" id="orangePosX" min="0" max="1436" value="77">
+                <span class="value" id="orangePosXValue">77px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja Y:</label>
+                <input type="range" id="orangePosY" min="0" max="764" value="475">
+                <span class="value" id="orangePosYValue">475px</span>
+            </div>
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="setOrangePreset(2, 3)">2:3</button>
+                <button class="preset-btn" onclick="setOrangePreset(3, 2)">3:2</button>
+                <button class="preset-btn" onclick="setOrangePreset(4, 3)">4:3</button>
+                <button class="preset-btn" onclick="setOrangePreset(3, 4)">3:4</button>
+                <button class="preset-btn" onclick="setOrangePreset(16, 9)">16:9</button>
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeRounded" onchange="toggleOrangeRounded()">
+                    Zaokrąglij
+                </label>
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeLockRatio" onchange="toggleOrangeLockRatio()" disabled>
+                    Blokuj
+                </label>
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeCircle" onchange="toggleOrangeCircle()">
+                    Koło
+                </label>
+            </div>
+            <div class="control-row">
+                <label>Zoom img:</label>
+                <input type="range" id="orangeZoom" min="50" max="200" value="100" disabled>
+                <button class="preset-btn" id="orangeRemoveImg" onclick="removeOrangeImage()" disabled>Usuń img</button>
+            </div>
+            <div class="control-row">
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeCaptionCheck" onchange="toggleOrangeCaption()">
+                    Podpis
+                </label>
+                <input type="range" id="orangeCaptionSize" min="8" max="50" value="12" disabled>
+                <span class="value" id="orangeCaptionSizeValue">12px</span>
+            </div>
+        </div>
+
+        <div class="proportions">
+            <h3>Proporcje (szer:wys)</h3>
+            <div class="proportion-display green-proportion" id="greenProportion">Zielone: 922:778 (118.5%)</div>
+            <div class="proportion-display orange-proportion" id="orangeProportion">Pomarańczowe: 538:346 (155.5%)</div>
+        </div>
+
+        <div class="control-group text-controls">
+            <h3 style="font-size: 14px;">Nagłówek
+                <label class="visibility-control">
+                    <input type="checkbox" id="headerHidden" onchange="toggleHeaderVisibility()">
+                    Ukryj
+                </label>
+            </h3>
+            <div class="control-row">
+                <label>Pozycja X:</label>
+                <input type="range" id="headerPosX" min="0" max="1436" value="50">
+                <span class="value" id="headerPosXValue">50px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja Y:</label>
+                <input type="range" id="headerPosY" min="0" max="764" value="50">
+                <span class="value" id="headerPosYValue">50px</span>
+            </div>
+            <div class="control-row">
+                <label>Rozmiar:</label>
+                <input type="range" id="headerFontSize" min="12" max="72" value="32">
+                <span class="value" id="headerFontSizeValue">32px</span>
+            </div>
+            <div class="control-row">
+                <label>Margines L:</label>
+                <input type="range" id="headerMarginLeft" min="5" max="500" value="8">
+                <span class="value" id="headerMarginLeftValue">8px</span>
+            </div>
+            <div class="control-row">
+                <label>Margines P:</label>
+                <input type="range" id="headerMarginRight" min="5" max="500" value="8">
+                <span class="value" id="headerMarginRightValue">8px</span>
+            </div>
+            <div class="control-row">
+                <label>Font:</label>
+                <select id="headerFontFamily">
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Times New Roman, serif">Times</option>
+                    <option value="Helvetica, sans-serif">Helvetica</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+                <button class="font-btn" id="headerBold" onclick="toggleHeaderStyle('bold')">B</button>
+                <button class="font-btn" id="headerItalic" onclick="toggleHeaderStyle('italic')">I</button>
+                <button class="font-btn" id="headerUnderline" onclick="toggleHeaderStyle('underline')">U</button>
+                <button class="font-btn" onclick="openHeaderColorPopup()">Kolory</button>
+                <div class="color-presets">
+                    <div class="color-preset" style="background-color: #FFEB3B" onclick="setHeaderPresetColor('#FFEB3B', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #81C784" onclick="setHeaderPresetColor('#81C784', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #FF9800" onclick="setHeaderPresetColor('#FF9800', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #BBDEFB" onclick="setHeaderPresetColor('#BBDEFB', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #F8BBD9" onclick="setHeaderPresetColor('#F8BBD9', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #424242" onclick="setHeaderPresetColor('#424242', '#FFFFFF')"></div>
+                    <div class="color-preset" style="background-color: #1565C0" onclick="setHeaderPresetColor('#1565C0', '#FFFFFF')"></div>
+                    <div class="color-preset" style="background-color: #6A1B9A" onclick="setHeaderPresetColor('#6A1B9A', '#FFFFFF')"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group content-controls">
+            <h3 style="font-size: 14px;">Treść slajdu
+                <label class="visibility-control">
+                    <input type="checkbox" id="contentHidden" onchange="toggleContentVisibility()">
+                    Ukryj
+                </label>
+            </h3>
+            <div class="control-row">
+                <label>Pozycja X:</label>
+                <input type="range" id="contentPosX" min="0" max="1436" value="50">
+                <span class="value" id="contentPosXValue">50px</span>
+            </div>
+            <div class="control-row">
+                <label>Pozycja Y:</label>
+                <input type="range" id="contentPosY" min="0" max="764" value="150">
+                <span class="value" id="contentPosYValue">150px</span>
+            </div>
+            <div class="control-row">
+                <label>Rozmiar:</label>
+                <input type="range" id="contentFontSize" min="12" max="72" value="18">
+                <span class="value" id="contentFontSizeValue">18px</span>
+            </div>
+            <div class="control-row">
+                <label>Margines L:</label>
+                <input type="range" id="contentMarginLeft" min="5" max="500" value="8">
+                <span class="value" id="contentMarginLeftValue">8px</span>
+            </div>
+            <div class="control-row">
+                <label>Margines P:</label>
+                <input type="range" id="contentMarginRight" min="5" max="500" value="8">
+                <span class="value" id="contentMarginRightValue">8px</span>
+            </div>
+            <div class="control-row">
+                <label>Font:</label>
+                <select id="contentFontFamily">
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Times New Roman, serif">Times</option>
+                    <option value="Helvetica, sans-serif">Helvetica</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+                <button class="font-btn" id="contentBold" onclick="toggleContentStyle('bold')">B</button>
+                <button class="font-btn" id="contentItalic" onclick="toggleContentStyle('italic')">I</button>
+                <button class="font-btn" id="contentUnderline" onclick="toggleContentStyle('underline')">U</button>
+                <button class="font-btn" onclick="openContentColorPopup()">Kolory</button>
+                <div class="color-presets">
+                    <div class="color-preset" style="background-color: #FFEB3B" onclick="setContentPresetColor('#FFEB3B', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #81C784" onclick="setContentPresetColor('#81C784', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #FF9800" onclick="setContentPresetColor('#FF9800', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #BBDEFB" onclick="setContentPresetColor('#BBDEFB', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #F8BBD9" onclick="setContentPresetColor('#F8BBD9', '#000000')"></div>
+                    <div class="color-preset" style="background-color: #424242" onclick="setContentPresetColor('#424242', '#FFFFFF')"></div>
+                    <div class="color-preset" style="background-color: #1565C0" onclick="setContentPresetColor('#1565C0', '#FFFFFF')"></div>
+                    <div class="color-preset" style="background-color: #6A1B9A" onclick="setContentPresetColor('#6A1B9A', '#FFFFFF')"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-background-control">
+            <h3 style="font-size: 14px;">Tło slajdu</h3>
+            <div class="control-row">
+                <label>Kolor tła:</label>
+                <input type="color" id="slideBackgroundColor" value="#ffffff">
+                <div class="color-presets">
+                    <div class="color-preset" style="background-color: #FFFFFF" onclick="setSlidePresetColor('#FFFFFF')"></div>
+                    <div class="color-preset" style="background-color: #F5F5F5" onclick="setSlidePresetColor('#F5F5F5')"></div>
+                    <div class="color-preset" style="background-color: #E3F2FD" onclick="setSlidePresetColor('#E3F2FD')"></div>
+                    <div class="color-preset" style="background-color: #FFF3E0" onclick="setSlidePresetColor('#FFF3E0')"></div>
+                    <div class="color-preset" style="background-color: #F3E5F5" onclick="setSlidePresetColor('#F3E5F5')"></div>
+                    <div class="color-preset" style="background-color: #263238" onclick="setSlidePresetColor('#263238')"></div>
+                    <div class="color-preset" style="background-color: #1A237E" onclick="setSlidePresetColor('#1A237E')"></div>
+                    <div class="color-preset" style="background-color: #4A148C" onclick="setSlidePresetColor('#4A148C')"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-controls">
+            <div style="border-top: 1px solid #ddd; padding-top: 15px;"></div>
+            <div class="control-row">
+                <label>Opacity:</label>
+                <input type="range" id="panelOpacity" min="30" max="100" value="95">
+                <button class="position-toggle" id="positionToggle" onclick="togglePanelPosition()">Przenieś na prawo</button>
+            </div>
+        </div>
+
+        <div class="preset-control">
+            <h3>Presety układów</h3>
+            <div class="preset-controls" id="preset-controls">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="save-btn" onclick="saveNewPreset()">Zapisz</button>
+                    <button class="delete-btn" onclick="deleteCurrentPreset()" id="delete-preset-btn" disabled>Usuń</button>
+                </div>
+                <button class="export-btn" onclick="exportSlide()" title="Eksportuj slajd">📤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SLIDE_WIDTH = 1536;
+        const SLIDE_HEIGHT = 864;
+        
+        const greenBox = document.getElementById('greenBox');
+        const orangeBox = document.getElementById('orangeBox');
+        const container = document.querySelector('.container');
+        
+        const greenWidth = document.getElementById('greenWidth');
+        const greenHeight = document.getElementById('greenHeight');
+        const greenPosX = document.getElementById('greenPosX');
+        const greenPosY = document.getElementById('greenPosY');
+        const orangeWidth = document.getElementById('orangeWidth');
+        const orangeHeight = document.getElementById('orangeHeight');
+        const orangePosX = document.getElementById('orangePosX');
+        const orangePosY = document.getElementById('orangePosY');
+        
+        const greenWidthValue = document.getElementById('greenWidthValue');
+        const greenHeightValue = document.getElementById('greenHeightValue');
+        const greenPosXValue = document.getElementById('greenPosXValue');
+        const greenPosYValue = document.getElementById('greenPosYValue');
+        const orangeWidthValue = document.getElementById('orangeWidthValue');
+        const orangeHeightValue = document.getElementById('orangeHeightValue');
+        const orangePosXValue = document.getElementById('orangePosXValue');
+        const orangePosYValue = document.getElementById('orangePosYValue');
+        
+        const greenProportion = document.getElementById('greenProportion');
+        const orangeProportion = document.getElementById('orangeProportion');
+
+        const panelOpacity = document.getElementById('panelOpacity');
+        const panelOpacityValue = document.getElementById('panelOpacityValue');
+        const controlPanel = document.querySelector('.control-panel');
+
+        const textHeader = document.getElementById('textHeader');
+        const textContent = document.getElementById('textContent');
+        
+        const headerPosX = document.getElementById('headerPosX');
+        const headerPosY = document.getElementById('headerPosY');
+        const headerFontSize = document.getElementById('headerFontSize');
+        const headerFontFamily = document.getElementById('headerFontFamily');
+        const headerPosXValue = document.getElementById('headerPosXValue');
+        const headerPosYValue = document.getElementById('headerPosYValue');
+        const headerFontSizeValue = document.getElementById('headerFontSizeValue');
+        const headerMarginLeft = document.getElementById('headerMarginLeft');
+        const headerMarginLeftValue = document.getElementById('headerMarginLeftValue');
+        const headerMarginRight = document.getElementById('headerMarginRight');
+        const headerMarginRightValue = document.getElementById('headerMarginRightValue');
+        
+        const contentPosX = document.getElementById('contentPosX');
+        const contentPosY = document.getElementById('contentPosY');
+        const contentFontSize = document.getElementById('contentFontSize');
+        const contentFontFamily = document.getElementById('contentFontFamily');
+        const contentPosXValue = document.getElementById('contentPosXValue');
+        const contentPosYValue = document.getElementById('contentPosYValue');
+        const contentFontSizeValue = document.getElementById('contentFontSizeValue');
+        const contentMarginLeft = document.getElementById('contentMarginLeft');
+        const contentMarginLeftValue = document.getElementById('contentMarginLeftValue');
+        const contentMarginRight = document.getElementById('contentMarginRight');
+        const contentMarginRightValue = document.getElementById('contentMarginRightValue');
+
+        const PRESET_RATIOS = [
+            {w: 1, h: 1, tolerance: 0.05},
+            {w: 3, h: 2, tolerance: 0.05},
+            {w: 4, h: 3, tolerance: 0.05},
+            {w: 3, h: 4, tolerance: 0.05},
+            {w: 16, h: 9, tolerance: 0.05}
+        ];
+
+        let headerStyles = {bold: false, italic: false, underline: false};
+        let contentStyles = {bold: false, italic: false, underline: false};
+        let panelOnRight = false;
+        let elementVisibility = {green: true, orange: true, header: true, content: true};
+        let greenCurrentRatio = null;
+        let orangeCurrentRatio = null;
+        let greenLockRatio = false;
+        let orangeLockRatio = false;
+        let greenLockedRatio = null;
+        let orangeLockedRatio = null;
+
+        function scaleContainer() {
+        }
+
+        function isPresetRatio(width, height) {
+            const currentRatio = width / height;
+            
+            for (const preset of PRESET_RATIOS) {
+                const presetRatio = preset.w / preset.h;
+                const difference = Math.abs(currentRatio - presetRatio);
+                const tolerance = presetRatio * preset.tolerance;
+                
+                if (difference <= tolerance) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateLockRatioState(elementType) {
+            const width = elementType === 'green' ? parseInt(greenWidth.value) : parseInt(orangeWidth.value);
+            const height = elementType === 'green' ? parseInt(greenHeight.value) : parseInt(orangeHeight.value);
+            const lockCheckbox = document.getElementById(elementType + 'LockRatio');
+            
+            if (isPresetRatio(width, height)) {
+                lockCheckbox.disabled = false;
+            } else {
+                lockCheckbox.disabled = true;
+                lockCheckbox.checked = false;
+                if (elementType === 'green') {
+                    greenLockRatio = false;
+                } else {
+                    orangeLockRatio = false;
+                }
+            }
+        }
+
+        function updateGreen() {
+            const w = parseInt(greenWidth.value);
+            const h = parseInt(greenHeight.value);
+            const x = parseInt(greenPosX.value);
+            const y = parseInt(greenPosY.value);
+            
+            greenBox.style.width = w + 'px';
+            greenBox.style.height = h + 'px';
+            greenBox.style.left = x + 'px';
+            greenBox.style.top = y + 'px';
+            greenBox.style.right = 'auto';
+            
+            greenWidthValue.textContent = `${w}px`;
+            greenHeightValue.textContent = `${h}px`;
+            greenPosXValue.textContent = `${x}px`;
+            greenPosYValue.textContent = `${y}px`;
+            
+            const actualRatio = w / h;
+            const percentage = (actualRatio * 100).toFixed(1);
+            const displayRatio = greenCurrentRatio || simplifyRatioFromPx(w, h);
+            greenProportion.textContent = `Zielone: ${displayRatio} (${percentage}%, ${w}x${h})`;
+            
+            updateLockRatioState('green');
+        }
+
+        function updateOrange() {
+            const w = parseInt(orangeWidth.value);
+            const h = parseInt(orangeHeight.value);
+            const x = parseInt(orangePosX.value);
+            const y = parseInt(orangePosY.value);
+            
+            orangeBox.style.width = w + 'px';
+            orangeBox.style.height = h + 'px';
+            orangeBox.style.left = x + 'px';
+            orangeBox.style.top = y + 'px';
+            
+            orangeWidthValue.textContent = `${w}px`;
+            orangeHeightValue.textContent = `${h}px`;
+            orangePosXValue.textContent = `${x}px`;
+            orangePosYValue.textContent = `${y}px`;
+            
+            const actualRatio = w / h;
+            const percentage = (actualRatio * 100).toFixed(1);
+            const displayRatio = orangeCurrentRatio || simplifyRatioFromPx(w, h);
+            orangeProportion.textContent = `Pomarańczowe: ${displayRatio} (${percentage}%, ${w}x${h})`;
+            
+            updateLockRatioState('orange');
+        }
+
+        function simplifyRatio(w, h) {
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(w, h);
+            return `${(w/divisor).toFixed(1)}:${(h/divisor).toFixed(1)}`;
+        }
+
+        function simplifyRatioFromPx(pxW, pxH) {
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(pxW, pxH);
+            return `${(pxW/divisor).toFixed(1)}:${(pxH/divisor).toFixed(1)}`;
+        }
+
+        function setGreenPreset(ratioW, ratioH) {
+            const currentW = parseInt(greenWidth.value);
+            const currentH = parseInt(greenHeight.value);
+            const longerSidePx = Math.max(currentW, currentH);
+            
+            let newW, newH;
+            if (ratioW > ratioH) {
+                newW = longerSidePx;
+                newH = Math.round(longerSidePx * (ratioH / ratioW));
+            } else {
+                newH = longerSidePx;
+                newW = Math.round(longerSidePx * (ratioW / ratioH));
+            }
+            
+            greenWidth.value = Math.min(1400, Math.max(100, newW));
+            greenHeight.value = Math.min(800, Math.max(100, newH));
+            greenCurrentRatio = `${ratioW}:${ratioH}`;
+            updateGreen();
+        }
+
+        function setOrangePreset(ratioW, ratioH) {
+            const currentW = parseInt(orangeWidth.value);
+            const currentH = parseInt(orangeHeight.value);
+            const longerSidePx = Math.max(currentW, currentH);
+            
+            let newW, newH;
+            if (ratioW > ratioH) {
+                newW = longerSidePx;
+                newH = Math.round(longerSidePx * (ratioH / ratioW));
+            } else {
+                newH = longerSidePx;
+                newW = Math.round(longerSidePx * (ratioW / ratioH));
+            }
+            
+            orangeWidth.value = Math.min(1400, Math.max(100, newW));
+            orangeHeight.value = Math.min(800, Math.max(100, newH));
+            orangeCurrentRatio = `${ratioW}:${ratioH}`;
+            updateOrange();
+        }
+
+        greenWidth.addEventListener('input', () => {
+            greenCurrentRatio = null;
+            
+            if (document.getElementById('greenCircle').checked) {
+                greenHeight.value = greenWidth.value;
+                greenHeightValue.textContent = `${greenWidth.value}px`;
+                document.getElementById('greenBox').style.borderRadius = '50%';
+            }
+            else if (greenLockRatio && greenLockedRatio) {
+                const newHeight = Math.round(parseFloat(greenWidth.value) / greenLockedRatio);
+                const clampedHeight = Math.max(100, Math.min(800, newHeight));
+                
+                if (clampedHeight !== newHeight) {
+                    const adjustedWidth = Math.round(clampedHeight * greenLockedRatio);
+                    greenWidth.value = adjustedWidth;
+                    greenWidthValue.textContent = `${adjustedWidth}px`;
+                }
+                
+                greenHeight.value = clampedHeight;
+                greenHeightValue.textContent = `${clampedHeight}px`;
+            }
+            
+            updateGreen();
+            updateGreenCaption();
+            updateLockRatioState('green');
+            if (!document.getElementById('greenCircle').checked) {
+                toggleGreenRounded();
+            }
+        });
+        greenHeight.addEventListener('input', () => {
+            greenCurrentRatio = null;
+            
+            if (greenLockRatio && greenLockedRatio && !document.getElementById('greenCircle').checked) {
+                const newWidth = Math.round(parseFloat(greenHeight.value) * greenLockedRatio);
+                const clampedWidth = Math.max(100, Math.min(1400, newWidth));
+                
+                if (clampedWidth !== newWidth) {
+                    const adjustedHeight = Math.round(clampedWidth / greenLockedRatio);
+                    greenHeight.value = adjustedHeight;
+                    greenHeightValue.textContent = `${adjustedHeight}px`;
+                }
+                
+                greenWidth.value = clampedWidth;
+                greenWidthValue.textContent = `${clampedWidth}px`;
+            }
+            
+            updateGreen();
+            updateGreenCaption();
+            updateLockRatioState('green');
+            toggleGreenRounded();
+        });
+        greenPosX.addEventListener('input', () => {
+            updateGreen();
+            updateGreenCaption();
+        });
+        greenPosY.addEventListener('input', () => {
+            updateGreen();
+            updateGreenCaption();
+        });
+        orangeWidth.addEventListener('input', () => {
+            orangeCurrentRatio = null;
+            
+            if (document.getElementById('orangeCircle').checked) {
+                orangeHeight.value = orangeWidth.value;
+                orangeHeightValue.textContent = `${orangeWidth.value}px`;
+                document.getElementById('orangeBox').style.borderRadius = '50%';
+            }
+            else if (orangeLockRatio && orangeLockedRatio) {
+                const newHeight = Math.round(parseFloat(orangeWidth.value) / orangeLockedRatio);
+                const clampedHeight = Math.max(100, Math.min(800, newHeight));
+                
+                if (clampedHeight !== newHeight) {
+                    const adjustedWidth = Math.round(clampedHeight * orangeLockedRatio);
+                    orangeWidth.value = adjustedWidth;
+                    orangeWidthValue.textContent = `${adjustedWidth}px`;
+                }
+                
+                orangeHeight.value = clampedHeight;
+                orangeHeightValue.textContent = `${clampedHeight}px`;
+            }
+            
+            updateOrange();
+            updateOrangeCaption();
+            updateLockRatioState('orange');
+            if (!document.getElementById('orangeCircle').checked) {
+                toggleOrangeRounded();
+            }
+        });
+        orangeHeight.addEventListener('input', () => {
+            orangeCurrentRatio = null;
+            
+            if (orangeLockRatio && orangeLockedRatio && !document.getElementById('orangeCircle').checked) {
+                const newWidth = Math.round(parseFloat(orangeHeight.value) * orangeLockedRatio);
+                const clampedWidth = Math.max(100, Math.min(1400, newWidth));
+                
+                if (clampedWidth !== newWidth) {
+                    const adjustedHeight = Math.round(clampedWidth / orangeLockedRatio);
+                    orangeHeight.value = adjustedHeight;
+                    orangeHeightValue.textContent = `${adjustedHeight}px`;
+                }
+                
+                orangeWidth.value = clampedWidth;
+                orangeWidthValue.textContent = `${clampedWidth}px`;
+            }
+            
+            updateOrange();
+            updateOrangeCaption();
+            updateLockRatioState('orange');
+            toggleOrangeRounded();
+        });
+        orangePosX.addEventListener('input', () => {
+            updateOrange();
+            updateOrangeCaption();
+        });
+        orangePosY.addEventListener('input', () => {
+            updateOrange();
+            updateOrangeCaption();
+        });
+
+        function updatePanelOpacity() {
+            const opacity = panelOpacity.value;
+            controlPanel.style.background = `rgba(255, 255, 255, ${opacity / 100})`;
+        }
+
+        panelOpacity.addEventListener('input', updatePanelOpacity);
+
+        function updateHeader() {
+            const x = parseInt(headerPosX.value);
+            const y = parseInt(headerPosY.value);
+            const fontSize = parseInt(headerFontSize.value);
+            const fontFamily = headerFontFamily.value;
+            const marginLeft = parseInt(headerMarginLeft.value);
+            const marginRight = parseInt(headerMarginRight.value);
+            
+            textHeader.style.left = x + 'px';
+            textHeader.style.top = y + 'px';
+            textHeader.style.fontSize = fontSize + 'px';
+            textHeader.style.fontFamily = fontFamily;
+            textHeader.style.paddingLeft = marginLeft + 'px';
+            textHeader.style.paddingRight = marginRight + 'px';
+            
+            textHeader.style.fontWeight = headerStyles.bold ? 'bold' : 'normal';
+            textHeader.style.fontStyle = headerStyles.italic ? 'italic' : 'normal';
+            textHeader.style.textDecoration = headerStyles.underline ? 'underline' : 'none';
+            
+            headerPosXValue.textContent = `${x}px`;
+            headerPosYValue.textContent = `${y}px`;
+            headerFontSizeValue.textContent = `${fontSize}px`;
+            headerMarginLeftValue.textContent = `${marginLeft}px`;
+            headerMarginRightValue.textContent = `${marginRight}px`;
+            
+            autoResizeTextarea(textHeader);
+        }
+
+        function updateContent() {
+            const x = parseInt(contentPosX.value);
+            const y = parseInt(contentPosY.value);
+            const fontSize = parseInt(contentFontSize.value);
+            const fontFamily = contentFontFamily.value;
+            const marginLeft = parseInt(contentMarginLeft.value);
+            const marginRight = parseInt(contentMarginRight.value);
+            
+            textContent.style.left = x + 'px';
+            textContent.style.top = y + 'px';
+            textContent.style.fontSize = fontSize + 'px';
+            textContent.style.fontFamily = fontFamily;
+            textContent.style.paddingLeft = marginLeft + 'px';
+            textContent.style.paddingRight = marginRight + 'px';
+            
+            textContent.style.fontWeight = contentStyles.bold ? 'bold' : 'normal';
+            textContent.style.fontStyle = contentStyles.italic ? 'italic' : 'normal';
+            textContent.style.textDecoration = contentStyles.underline ? 'underline' : 'none';
+            
+            contentPosXValue.textContent = `${x}px`;
+            contentPosYValue.textContent = `${y}px`;
+            contentFontSizeValue.textContent = `${fontSize}px`;
+            contentMarginLeftValue.textContent = `${marginLeft}px`;
+            contentMarginRightValue.textContent = `${marginRight}px`;
+            
+            autoResizeTextarea(textContent);
+            
+            if (document.getElementById('greenCaptionCheck').checked) {
+                updateGreenCaption();
+            }
+            if (document.getElementById('orangeCaptionCheck').checked) {
+                updateOrangeCaption();
+            }
+        }
+
+        function autoResizeTextarea(element) {
+            
+            const computedStyle = window.getComputedStyle(element);
+            let newWidth, newHeight;
+            
+            if (element.contentEditable === 'true') {
+                const textNodes = [];
+                const walker = document.createTreeWalker(
+                    element, 
+                    NodeFilter.SHOW_TEXT, 
+                    null, 
+                    false
+                );
+                
+                let node;
+                while (node = walker.nextNode()) {
+                    textNodes.push(node.textContent);
+                }
+                
+                const fullText = textNodes.join('');
+                const divElements = element.querySelectorAll('div');
+                
+                let lines = [];
+                if (divElements.length > 0) {
+                    const firstLineText = element.childNodes[0] && element.childNodes[0].nodeType === Node.TEXT_NODE 
+                        ? element.childNodes[0].textContent : '';
+                    if (firstLineText) lines.push(firstLineText);
+                    
+                    divElements.forEach(div => {
+                        const divText = div.textContent || '';
+                        if (divText || div.innerHTML === '<br>') {
+                            lines.push(divText);
+                        }
+                    });
+                } else {
+                    lines = fullText.split('\n');
+                }
+                
+                let maxLineLength = 0;
+                let longestLine = '';
+                lines.forEach(line => {
+                    if (line.length > maxLineLength) {
+                        maxLineLength = line.length;
+                        longestLine = line;
+                    }
+                });
+                
+                const fontSize = parseInt(element.style.fontSize) || parseInt(computedStyle.fontSize) || 16;
+                const fontFamily = element.style.fontFamily || computedStyle.fontFamily;
+                
+                let charWidthFactor = 0.6;
+                if (fontFamily.toLowerCase().includes('times')) charWidthFactor = 0.55;
+                if (fontFamily.toLowerCase().includes('georgia')) charWidthFactor = 0.58;
+                if (fontFamily.toLowerCase().includes('helvetica')) charWidthFactor = 0.62;
+                if (fontFamily.toLowerCase().includes('verdana')) charWidthFactor = 0.65;
+                
+                const estimatedWidth = Math.max(100, maxLineLength * fontSize * charWidthFactor);
+                const currentPaddingLeft = parseInt(element.style.paddingLeft) || 8;
+                const currentPaddingRight = parseInt(element.style.paddingRight) || 8;
+                newWidth = estimatedWidth + currentPaddingLeft + currentPaddingRight + 5;
+                
+                const lineHeight = parseInt(computedStyle.lineHeight) || fontSize * 1.2;
+                const paddingTop = parseInt(computedStyle.paddingTop) || 0;
+                const paddingBottom = parseInt(computedStyle.paddingBottom) || 0;
+                const calculatedHeight = (lines.length * lineHeight) + paddingTop + paddingBottom;
+                newHeight = Math.max(40, calculatedHeight + 5);
+                
+                
+            } else {
+                const temp = document.createElement('div');
+                temp.style.font = computedStyle.font;
+                temp.style.fontWeight = element.style.fontWeight;
+                temp.style.fontStyle = element.style.fontStyle;
+                temp.style.position = 'absolute';
+                temp.style.visibility = 'hidden';
+                temp.style.whiteSpace = 'nowrap';
+                temp.style.width = 'auto';
+                temp.style.padding = computedStyle.padding;
+                
+                const content = element.value;
+                temp.textContent = content;
+                
+                document.body.appendChild(temp);
+                newWidth = Math.max(50, temp.offsetWidth + 10);
+                document.body.removeChild(temp);
+                
+                const lineCount = (content.match(/\n/g) || []).length + 1;
+                const fontSize = parseInt(computedStyle.fontSize) || 16;
+                const lineHeight = parseInt(computedStyle.lineHeight) || fontSize * 1.2;
+                const paddingTop = parseInt(computedStyle.paddingTop) || 0;
+                const paddingBottom = parseInt(computedStyle.paddingBottom) || 0;
+                newHeight = Math.max(40, lineCount * lineHeight + paddingTop + paddingBottom + 10);
+            }
+            
+            element.style.width = newWidth + 'px';
+            element.style.height = newHeight + 'px';
+            
+        }
+
+        function toggleHeaderStyle(style) {
+            headerStyles[style] = !headerStyles[style];
+            document.getElementById(`header${style.charAt(0).toUpperCase() + style.slice(1)}`).classList.toggle('active');
+            updateHeader();
+        }
+
+        function toggleContentStyle(style) {
+            contentStyles[style] = !contentStyles[style];
+            document.getElementById(`content${style.charAt(0).toUpperCase() + style.slice(1)}`).classList.toggle('active');
+            updateContent();
+        }
+
+        headerPosX.addEventListener('input', updateHeader);
+        headerPosY.addEventListener('input', updateHeader);
+        headerFontSize.addEventListener('input', updateHeader);
+        headerFontFamily.addEventListener('change', updateHeader);
+        headerMarginLeft.addEventListener('input', updateHeader);
+        headerMarginRight.addEventListener('input', updateHeader);
+        contentPosX.addEventListener('input', updateContent);
+        contentPosY.addEventListener('input', updateContent);
+        contentFontSize.addEventListener('input', updateContent);
+        contentFontFamily.addEventListener('change', updateContent);
+        contentMarginLeft.addEventListener('input', updateContent);
+        contentMarginRight.addEventListener('input', updateContent);
+
+        function setupTextFieldEvents(element) {
+            element.addEventListener('input', () => {
+                autoResizeTextarea(element);
+            });
+            element.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    setTimeout(() => autoResizeTextarea(element), 0);
+                }
+            });
+            element.addEventListener('keyup', () => {
+                autoResizeTextarea(element);
+            });
+            element.addEventListener('paste', () => {
+                setTimeout(() => autoResizeTextarea(element), 10);
+            });
+            element.addEventListener('blur', () => autoResizeTextarea(element));
+            
+            const observer = new MutationObserver(() => {
+                autoResizeTextarea(element);
+            });
+            observer.observe(element, { 
+                childList: true, 
+                subtree: true, 
+                characterData: true 
+            });
+        }
+
+        setupTextFieldEvents(textHeader);
+        setupTextFieldEvents(textContent);
+        setupTextFieldEvents(document.getElementById('greenCaption'));
+        setupTextFieldEvents(document.getElementById('orangeCaption'));
+
+        function togglePanelPosition() {
+            panelOnRight = !panelOnRight;
+            const toggleBtn = document.getElementById('positionToggle');
+            
+            if (panelOnRight) {
+                controlPanel.style.left = 'auto';
+                controlPanel.style.right = '20px';
+                toggleBtn.textContent = 'Przenieś na lewo';
+            } else {
+                controlPanel.style.left = '20px';
+                controlPanel.style.right = 'auto';
+                toggleBtn.textContent = 'Przenieś na prawo';
+            }
+        }
+
+        function toggleGreenVisibility() {
+            elementVisibility.green = !document.getElementById('greenHidden').checked;
+            greenBox.style.display = elementVisibility.green ? 'block' : 'none';
+        }
+
+        function toggleOrangeVisibility() {
+            elementVisibility.orange = !document.getElementById('orangeHidden').checked;
+            orangeBox.style.display = elementVisibility.orange ? 'block' : 'none';
+        }
+
+        function toggleHeaderVisibility() {
+            elementVisibility.header = !document.getElementById('headerHidden').checked;
+            textHeader.style.display = elementVisibility.header ? 'grid' : 'none';
+        }
+
+        function toggleContentVisibility() {
+            elementVisibility.content = !document.getElementById('contentHidden').checked;
+            textContent.style.display = elementVisibility.content ? 'grid' : 'none';
+        }
+
+        let currentPreset = null;
+        let availablePresets = [];
+        
+        function loadPreset(presetNumber) {
+            fetch(`/api/presets/preset-${presetNumber}.json`)
+                .then(response => response.json())
+                .then(preset => {
+                    applyPreset(preset);
+                    setActivePreset(presetNumber);
+                })
+                .catch(error => {
+                    console.error('Błąd ładowania presetu:', error);
+                    alert(`Błąd ładowania Preset ${presetNumber}`);
+                });
+        }
+        
+        function applyPreset(preset) {
+            
+            greenWidth.value = preset.green.w;
+            greenHeight.value = preset.green.h;
+            greenPosX.value = preset.green.x;
+            greenPosY.value = preset.green.y;
+            
+            if (preset.green.circle !== undefined) {
+                document.getElementById('greenCircle').checked = preset.green.circle;
+                toggleGreenCircle();
+            }
+            if (preset.green.rounded !== undefined) {
+                document.getElementById('greenRounded').checked = preset.green.rounded;
+                toggleGreenRounded();
+            }
+            if (preset.green.lockRatio !== undefined) {
+                document.getElementById('greenLockRatio').checked = preset.green.lockRatio;
+                toggleGreenLockRatio();
+            }
+            if (preset.green.captionEnabled !== undefined) {
+                document.getElementById('greenCaptionCheck').checked = preset.green.captionEnabled;
+                toggleGreenCaption();
+            }
+            if (preset.green.captionText !== undefined) {
+                document.getElementById('greenCaption').textContent = preset.green.captionText;
+            }
+            if (preset.green.captionSize !== undefined) {
+                document.getElementById('greenCaptionSize').value = preset.green.captionSize;
+            }
+            if (preset.green.captionBackgroundColor !== undefined) {
+                document.getElementById('greenCaption').style.backgroundColor = preset.green.captionBackgroundColor;
+            } else {
+                document.getElementById('greenCaption').style.backgroundColor = '#81c784';
+            }
+            if (preset.green.captionColor !== undefined) {
+                document.getElementById('greenCaption').style.color = preset.green.captionColor;
+            } else {
+                document.getElementById('greenCaption').style.color = '#000000';
+            }
+            
+            orangeWidth.value = preset.orange.w;
+            orangeHeight.value = preset.orange.h;
+            orangePosX.value = preset.orange.x;
+            orangePosY.value = preset.orange.y;
+            
+            if (preset.orange.circle !== undefined) {
+                document.getElementById('orangeCircle').checked = preset.orange.circle;
+                toggleOrangeCircle();
+            }
+            if (preset.orange.rounded !== undefined) {
+                document.getElementById('orangeRounded').checked = preset.orange.rounded;
+                toggleOrangeRounded();
+            }
+            if (preset.orange.lockRatio !== undefined) {
+                document.getElementById('orangeLockRatio').checked = preset.orange.lockRatio;
+                toggleOrangeLockRatio();
+            }
+            if (preset.orange.captionEnabled !== undefined) {
+                document.getElementById('orangeCaptionCheck').checked = preset.orange.captionEnabled;
+                toggleOrangeCaption();
+            }
+            if (preset.orange.captionText !== undefined) {
+                document.getElementById('orangeCaption').textContent = preset.orange.captionText;
+            }
+            if (preset.orange.captionSize !== undefined) {
+                document.getElementById('orangeCaptionSize').value = preset.orange.captionSize;
+            }
+            if (preset.orange.captionBackgroundColor !== undefined) {
+                document.getElementById('orangeCaption').style.backgroundColor = preset.orange.captionBackgroundColor;
+            } else {
+                document.getElementById('orangeCaption').style.backgroundColor = '#81c784';
+            }
+            if (preset.orange.captionColor !== undefined) {
+                document.getElementById('orangeCaption').style.color = preset.orange.captionColor;
+            } else {
+                document.getElementById('orangeCaption').style.color = '#000000';
+            }
+            
+            headerPosX.value = preset.header.x;
+            headerPosY.value = preset.header.y;
+            headerFontSize.value = preset.header.fontSize;
+            headerFontFamily.value = preset.header.fontFamily;
+            
+            headerStyles = {bold: preset.header.bold, italic: preset.header.italic, underline: preset.header.underline};
+            
+            if (preset.header.backgroundColor !== undefined) {
+                document.getElementById('textHeader').style.backgroundColor = preset.header.backgroundColor;
+            } else {
+                document.getElementById('textHeader').style.backgroundColor = '#ffeb3b';
+            }
+            if (preset.header.color !== undefined) {
+                document.getElementById('textHeader').style.color = preset.header.color;
+            } else {
+                document.getElementById('textHeader').style.color = '#000000';
+            }
+            
+            if (preset.header.marginLeft !== undefined) {
+                headerMarginLeft.value = preset.header.marginLeft;
+            } else {
+                headerMarginLeft.value = 8;
+            }
+            if (preset.header.marginRight !== undefined) {
+                headerMarginRight.value = preset.header.marginRight;
+            } else {
+                headerMarginRight.value = 8;
+            }
+            
+            contentPosX.value = preset.content.x;
+            contentPosY.value = preset.content.y;
+            contentFontSize.value = preset.content.fontSize;
+            contentFontFamily.value = preset.content.fontFamily;
+            
+            contentStyles = {bold: preset.content.bold, italic: preset.content.italic, underline: preset.content.underline};
+            
+            if (preset.content.backgroundColor !== undefined) {
+                document.getElementById('textContent').style.backgroundColor = preset.content.backgroundColor;
+            } else {
+                document.getElementById('textContent').style.backgroundColor = '#81c784';
+            }
+            if (preset.content.color !== undefined) {
+                document.getElementById('textContent').style.color = preset.content.color;
+            } else {
+                document.getElementById('textContent').style.color = '#000000';
+            }
+            
+            if (preset.content.marginLeft !== undefined) {
+                contentMarginLeft.value = preset.content.marginLeft;
+            } else {
+                contentMarginLeft.value = 8;
+            }
+            if (preset.content.marginRight !== undefined) {
+                contentMarginRight.value = preset.content.marginRight;
+            } else {
+                contentMarginRight.value = 8;
+            }
+            
+            if (preset.slide && preset.slide.backgroundColor !== undefined) {
+                document.getElementById('slideBackgroundColor').value = preset.slide.backgroundColor;
+                document.querySelector('.container').style.backgroundColor = preset.slide.backgroundColor;
+            }
+            
+            elementVisibility = {
+                green: !preset.green.hidden,
+                orange: !preset.orange.hidden,
+                header: !preset.header.hidden,
+                content: !preset.content.hidden
+            };
+            
+            document.getElementById('greenHidden').checked = preset.green.hidden;
+            document.getElementById('orangeHidden').checked = preset.orange.hidden;
+            document.getElementById('headerHidden').checked = preset.header.hidden;
+            document.getElementById('contentHidden').checked = preset.content.hidden;
+            
+            toggleGreenVisibility();
+            toggleOrangeVisibility();
+            toggleHeaderVisibility();
+            toggleContentVisibility();
+            
+            ['bold', 'italic', 'underline'].forEach(style => {
+                document.getElementById(`header${style.charAt(0).toUpperCase() + style.slice(1)}`).classList.toggle('active', headerStyles[style]);
+                document.getElementById(`content${style.charAt(0).toUpperCase() + style.slice(1)}`).classList.toggle('active', contentStyles[style]);
+            });
+            
+            updateGreen();
+            updateOrange();
+            updateHeader();
+            updateContent();
+            
+            if (document.getElementById('greenCaptionCheck').checked) {
+                updateGreenCaption();
+            }
+            if (document.getElementById('orangeCaptionCheck').checked) {
+                updateOrangeCaption();
+            }
+            
+        }
+
+        window.addEventListener('resize', () => {
+            scaleContainer();
+        });
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                scaleContainer();
+            });
+        }
+
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                setTimeout(() => {
+                    scaleContainer();
+                }, 100);
+            }
+        }, { passive: true });
+
+        function setActivePreset(presetNumber) {
+            currentPreset = presetNumber;
+            document.querySelectorAll('.preset-layout-btn').forEach(btn => btn.classList.remove('active'));
+            const targetBtn = document.querySelector(`[data-preset="${presetNumber}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            
+            const deleteBtn = document.getElementById('delete-preset-btn');
+            deleteBtn.disabled = (availablePresets.length === 0 || currentPreset === null);
+        }
+        
+        function updatePresetButtons() {
+            const presetControls = document.getElementById('preset-controls');
+            const buttonsContainer = presetControls.querySelector('div');
+            const saveBtn = presetControls.querySelector('.save-btn');
+            
+            presetControls.querySelectorAll('.preset-layout-btn').forEach(btn => btn.remove());
+            
+            availablePresets.forEach(presetNum => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-layout-btn';
+                btn.textContent = presetNum;
+                btn.setAttribute('data-preset', presetNum);
+                btn.onclick = () => loadPreset(presetNum);
+                if (presetNum === currentPreset) {
+                    btn.classList.add('active');
+                }
+                buttonsContainer.insertBefore(btn, saveBtn);
+            });
+            
+            const deleteBtn = document.getElementById('delete-preset-btn');
+            deleteBtn.disabled = (availablePresets.length === 0 || currentPreset === null);
+        }
+        
+        function saveNewPreset() {
+            const nextPresetNumber = availablePresets.length > 0 ? Math.max(...availablePresets) + 1 : 1;
+            
+            const headerElement = document.getElementById('textHeader');
+            const contentElement = document.getElementById('textContent');
+            
+            
+            const presetData = {
+                name: `Preset ${nextPresetNumber}`,
+                description: `Preset ${nextPresetNumber}`,
+                green: {
+                    w: parseInt(greenWidth.value),
+                    h: parseInt(greenHeight.value),
+                    x: parseInt(greenPosX.value),
+                    y: parseInt(greenPosY.value),
+                    hidden: !elementVisibility.green,
+                    circle: document.getElementById('greenCircle').checked,
+                    rounded: document.getElementById('greenRounded').checked,
+                    lockRatio: document.getElementById('greenLockRatio').checked,
+                    captionEnabled: document.getElementById('greenCaptionCheck').checked,
+                    captionText: document.getElementById('greenCaption').textContent || "Podpis",
+                    captionSize: parseInt(document.getElementById('greenCaptionSize').value),
+                    captionBackgroundColor: document.getElementById('greenCaption').style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
+                    captionColor: document.getElementById('greenCaption').style.color || contentElement.style.color || '#000000'
+                },
+                orange: {
+                    w: parseInt(orangeWidth.value),
+                    h: parseInt(orangeHeight.value),
+                    x: parseInt(orangePosX.value),
+                    y: parseInt(orangePosY.value),
+                    hidden: !elementVisibility.orange,
+                    circle: document.getElementById('orangeCircle').checked,
+                    rounded: document.getElementById('orangeRounded').checked,
+                    lockRatio: document.getElementById('orangeLockRatio').checked,
+                    captionEnabled: document.getElementById('orangeCaptionCheck').checked,
+                    captionText: document.getElementById('orangeCaption').textContent || "Podpis",
+                    captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
+                    captionBackgroundColor: document.getElementById('orangeCaption').style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
+                    captionColor: document.getElementById('orangeCaption').style.color || contentElement.style.color || '#000000'
+                },
+                header: {
+                    x: parseInt(headerPosX.value),
+                    y: parseInt(headerPosY.value),
+                    fontSize: parseInt(headerFontSize.value),
+                    fontFamily: headerFontFamily.value,
+                    bold: headerStyles.bold,
+                    italic: headerStyles.italic,
+                    underline: headerStyles.underline,
+                    hidden: !elementVisibility.header,
+                    backgroundColor: headerElement.style.backgroundColor || '#ffeb3b',
+                    color: headerElement.style.color || '#000000',
+                    marginLeft: parseInt(headerMarginLeft.value),
+                    marginRight: parseInt(headerMarginRight.value)
+                },
+                content: {
+                    x: parseInt(contentPosX.value),
+                    y: parseInt(contentPosY.value),
+                    fontSize: parseInt(contentFontSize.value),
+                    fontFamily: contentFontFamily.value,
+                    bold: contentStyles.bold,
+                    italic: contentStyles.italic,
+                    underline: contentStyles.underline,
+                    hidden: !elementVisibility.content,
+                    backgroundColor: contentElement.style.backgroundColor || '#81c784',
+                    color: contentElement.style.color || '#000000',
+                    marginLeft: parseInt(contentMarginLeft.value),
+                    marginRight: parseInt(contentMarginRight.value)
+                },
+                slide: {
+                    backgroundColor: document.getElementById('slideBackgroundColor').value
+                }
+            };
+            
+            
+            fetch('/api/save-preset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    presetNumber: nextPresetNumber,
+                    presetData: presetData
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    availablePresets.push(nextPresetNumber);
+                    availablePresets.sort((a, b) => a - b);
+                    
+                    updatePresetButtons();
+                    
+                    setActivePreset(nextPresetNumber);
+                    
+                    const btn = document.querySelector('.save-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Zapisano!';
+                    btn.style.background = '#4CAF50';
+                    
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '#2196F3';
+                    }, 2000);
+                } else {
+                    alert('Błąd zapisu presetu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Błąd zapisu presetu:', error);
+                alert('Błąd połączenia z serwerem');
+            });
+        }
+        
+        function deleteCurrentPreset() {
+            if (currentPreset === null || availablePresets.length === 0) {
+                alert('Brak presetów do usunięcia');
+                return;
+            }
+            
+            if (!confirm(`Czy na pewno usunąć Preset ${currentPreset}?`)) {
+                return;
+            }
+            
+            fetch('/api/delete-preset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    presetNumber: currentPreset
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    availablePresets = availablePresets.filter(num => num !== currentPreset);
+                    
+                    if (availablePresets.length > 0) {
+                        loadPreset(availablePresets[0]);
+                    } else {
+                        currentPreset = null;
+                    }
+                    
+                    updatePresetButtons();
+                    
+                } else {
+                    alert('Błąd usuwania presetu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Błąd usuwania presetu:', error);
+                alert('Błąd połączenia z serwerem');
+            });
+        }
+        
+        function savePosition() {
+            const greenData = {
+                width: greenWidth.value,
+                height: greenHeight.value,
+                posX: greenPosX.value,
+                posY: greenPosY.value,
+                hidden: !elementVisibility.green
+            };
+            
+            const orangeData = {
+                width: orangeWidth.value,
+                height: orangeHeight.value,
+                posX: orangePosX.value,
+                posY: orangePosY.value,
+                hidden: !elementVisibility.orange
+            };
+
+            const headerData = {
+                posX: headerPosX.value,
+                posY: headerPosY.value,
+                fontSize: headerFontSize.value,
+                fontFamily: headerFontFamily.value,
+                text: textHeader.value,
+                bold: headerStyles.bold,
+                italic: headerStyles.italic,
+                underline: headerStyles.underline,
+                hidden: !elementVisibility.header
+            };
+
+            const contentData = {
+                posX: contentPosX.value,
+                posY: contentPosY.value,
+                fontSize: contentFontSize.value,
+                fontFamily: contentFontFamily.value,
+                text: textContent.value,
+                bold: contentStyles.bold,
+                italic: contentStyles.italic,
+                underline: contentStyles.underline,
+                hidden: !elementVisibility.content
+            };
+
+            const positionData = `ZIELONE:
+Szerokość: ${greenData.width}px
+Wysokość: ${greenData.height}px
+Pozycja X: ${greenData.posX}px
+Pozycja Y: ${greenData.posY}px
+Ukryty: ${greenData.hidden}
+
+POMARAŃCZOWE:
+Szerokość: ${orangeData.width}px
+Wysokość: ${orangeData.height}px
+Pozycja X: ${orangeData.posX}px
+Pozycja Y: ${orangeData.posY}px
+Ukryty: ${orangeData.hidden}
+
+NAGŁÓWEK:
+Pozycja X: ${headerData.posX}px
+Pozycja Y: ${headerData.posY}px
+Rozmiar fontu: ${headerData.fontSize}px
+Font: ${headerData.fontFamily}
+Tekst: "${headerData.text}"
+Bold: ${headerData.bold}, Italic: ${headerData.italic}, Underline: ${headerData.underline}
+Ukryty: ${headerData.hidden}
+
+TREŚĆ:
+Pozycja X: ${contentData.posX}px
+Pozycja Y: ${contentData.posY}px
+Rozmiar fontu: ${contentData.fontSize}px
+Font: ${contentData.fontFamily}
+Tekst: "${contentData.text}"
+Bold: ${contentData.bold}, Italic: ${contentData.italic}, Underline: ${contentData.underline}
+Ukryty: ${contentData.hidden}
+
+---
+Preset JSON:
+{
+  "green": {"w":${greenData.width},"h":${greenData.height},"x":${greenData.posX},"y":${greenData.posY},"hidden":${greenData.hidden}},
+  "orange": {"w":${orangeData.width},"h":${orangeData.height},"x":${orangeData.posX},"y":${orangeData.posY},"hidden":${orangeData.hidden}},
+  "header": {"x":${headerData.posX},"y":${headerData.posY},"fontSize":${headerData.fontSize},"fontFamily":"${headerData.fontFamily}","bold":${headerData.bold},"italic":${headerData.italic},"underline":${headerData.underline},"text":"${headerData.text}","hidden":${headerData.hidden}},
+  "content": {"x":${contentData.posX},"y":${contentData.posY},"fontSize":${contentData.fontSize},"fontFamily":"${contentData.fontFamily}","bold":${contentData.bold},"italic":${contentData.italic},"underline":${contentData.underline},"text":"${contentData.text}","hidden":${contentData.hidden}}
+}`;
+
+            navigator.clipboard.writeText(positionData).then(() => {
+                const btn = document.querySelector('.save-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Skopiowano!';
+                btn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#2196F3';
+                }, 2000);
+            }).catch(err => {
+                console.error('Błąd kopiowania:', err);
+                alert('Nie udało się skopiować do schowka');
+            });
+        }
+
+        let selectedImage = null;
+        let currentBox = null;
+        let availableImages = [];
+        let greenImageUrl = null;
+        let orangeImageUrl = null;
+
+        const greenZoom = document.getElementById('greenZoom');
+        const greenZoomValue = document.getElementById('greenZoomValue');
+        const orangeZoom = document.getElementById('orangeZoom');
+        const orangeZoomValue = document.getElementById('orangeZoomValue');
+
+        document.getElementById('greenBox').addEventListener('click', function() {
+            currentBox = 'green';
+            openImagePopup();
+        });
+
+        document.getElementById('orangeBox').addEventListener('click', function() {
+            currentBox = 'orange';
+            openImagePopup();
+        });
+
+        async function openImagePopup() {
+            try {
+                console.log('openImagePopup: Rozpoczynam ładowanie obrazów...');
+                const response = await fetch('/api/template-images');
+                console.log('openImagePopup: Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('openImagePopup: Otrzymane dane:', data);
+                
+                availableImages = data.images || [];
+                console.log('openImagePopup: Liczba dostępnych obrazów:', availableImages.length);
+                
+                const imageGrid = document.getElementById('imageGrid');
+                imageGrid.innerHTML = '';
+                
+                if (availableImages.length === 0) {
+                    imageGrid.innerHTML = '<p>Brak dostępnych obrazów</p>';
+                    return;
+                }
+                
+                availableImages.forEach(imageName => {
+                    const imageItem = document.createElement('div');
+                    imageItem.className = 'image-item';
+                    imageItem.style.backgroundImage = `url('/img_slides/${imageName}')`;
+                    imageItem.dataset.imageName = imageName;
+                    
+                    imageItem.addEventListener('click', function() {
+                        document.querySelectorAll('.image-item').forEach(item => {
+                            item.classList.remove('selected');
+                        });
+                        
+                        this.classList.add('selected');
+                        selectedImage = imageName;
+                    });
+                    
+                    imageGrid.appendChild(imageItem);
+                });
+                
+                document.getElementById('popupOverlay').style.display = 'block';
+                document.getElementById('imagePopup').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Błąd ładowania obrazów:', error);
+                alert('Nie udało się załadować obrazów - sprawdź konsolę przeglądarki');
+            }
+        }
+
+        function closeImagePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+            document.getElementById('imagePopup').style.display = 'none';
+            selectedImage = null;
+            currentBox = null;
+        }
+
+        async function selectImage() {
+            if (!selectedImage || !currentBox) return;
+            
+            const boxElement = document.getElementById(currentBox === 'green' ? 'greenBox' : 'orangeBox');
+            const imageUrl = `/img_slides/${selectedImage}`;
+            boxElement.style.backgroundImage = `url('${imageUrl}')`;
+            boxElement.style.backgroundSize = 'cover';
+            boxElement.style.backgroundPosition = 'center';
+            
+            if (currentBox === 'green') {
+                greenImageUrl = imageUrl;
+                greenZoom.disabled = false;
+                document.getElementById('greenRemoveImg').disabled = false;
+            } else {
+                orangeImageUrl = imageUrl;
+                orangeZoom.disabled = false;
+                document.getElementById('orangeRemoveImg').disabled = false;
+            }
+            
+            closeImagePopup();
+        }
+
+        function updateGreenZoom() {
+            if (!greenImageUrl) return;
+            
+            const zoomValue = parseInt(greenZoom.value);
+            const greenBox = document.getElementById('greenBox');
+            greenBox.style.backgroundSize = `${zoomValue}%`;
+        }
+
+        function updateOrangeZoom() {
+            if (!orangeImageUrl) return;
+            
+            const zoomValue = parseInt(orangeZoom.value);
+            const orangeBox = document.getElementById('orangeBox');
+            orangeBox.style.backgroundSize = `${zoomValue}%`;
+        }
+
+        greenZoom.addEventListener('input', updateGreenZoom);
+        orangeZoom.addEventListener('input', updateOrangeZoom);
+
+        function removeGreenImage() {
+            const greenBox = document.getElementById('greenBox');
+            greenBox.style.backgroundImage = '';
+            greenBox.style.backgroundSize = '100%';
+            greenImageUrl = null;
+            greenZoom.disabled = true;
+            greenZoom.value = 100;
+            document.getElementById('greenRemoveImg').disabled = true;
+        }
+
+        function removeOrangeImage() {
+            const orangeBox = document.getElementById('orangeBox');
+            orangeBox.style.backgroundImage = '';
+            orangeBox.style.backgroundSize = '100%';
+            orangeImageUrl = null;
+            orangeZoom.disabled = true;
+            orangeZoom.value = 100;
+            document.getElementById('orangeRemoveImg').disabled = true;
+        }
+
+        let currentColorTarget = null;
+
+        function openHeaderColorPopup() {
+            currentColorTarget = 'header';
+            document.getElementById('colorPopupTitle').textContent = 'Kolory nagłówka';
+            
+            const header = document.getElementById('textHeader');
+            document.getElementById('popupBackgroundColor').value = rgbToHex(header.style.backgroundColor || 'rgba(255, 235, 59, 0.8)');
+            document.getElementById('popupTextColor').value = rgbToHex(header.style.color || '#000000');
+            
+            document.getElementById('colorPopupOverlay').style.display = 'block';
+            document.getElementById('colorPopup').style.display = 'block';
+        }
+
+        function openContentColorPopup() {
+            currentColorTarget = 'content';
+            document.getElementById('colorPopupTitle').textContent = 'Kolory treści';
+            
+            const content = document.getElementById('textContent');
+            document.getElementById('popupBackgroundColor').value = rgbToHex(content.style.backgroundColor || 'rgba(129, 199, 132, 0.8)');
+            document.getElementById('popupTextColor').value = rgbToHex(content.style.color || '#000000');
+            
+            document.getElementById('colorPopupOverlay').style.display = 'block';
+            document.getElementById('colorPopup').style.display = 'block';
+        }
+
+        function closeColorPopup() {
+            document.getElementById('colorPopupOverlay').style.display = 'none';
+            document.getElementById('colorPopup').style.display = 'none';
+            currentColorTarget = null;
+        }
+
+        function applyColors() {
+            const bgColor = document.getElementById('popupBackgroundColor').value;
+            const textColor = document.getElementById('popupTextColor').value;
+            
+            if (currentColorTarget === 'header') {
+                const header = document.getElementById('textHeader');
+                header.style.backgroundColor = bgColor;
+                header.style.color = textColor;
+            } else if (currentColorTarget === 'content') {
+                const content = document.getElementById('textContent');
+                content.style.backgroundColor = bgColor;
+                content.style.color = textColor;
+            }
+            
+            closeColorPopup();
+        }
+
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+            const match = rgb.match(/rgba?\(([^)]+)\)/);
+            if (!match) return '#000000';
+            const [r, g, b] = match[1].split(',').map(x => parseInt(x.trim()));
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function updateSlideBackground() {
+            const color = document.getElementById('slideBackgroundColor').value;
+            document.querySelector('.container').style.backgroundColor = color;
+        }
+
+        function toggleGreenRounded() {
+            const greenBox = document.getElementById('greenBox');
+            const isRounded = document.getElementById('greenRounded').checked;
+            const width = parseInt(greenWidth.value);
+            const height = parseInt(greenHeight.value);
+            const radius = Math.min(width, height) * 0.05;
+            
+            greenBox.style.borderRadius = isRounded ? `${radius}px` : '0px';
+        }
+
+        function toggleGreenCircle() {
+            const isCircle = document.getElementById('greenCircle').checked;
+            const greenHeightSlider = document.getElementById('greenHeight');
+            const greenWidthSlider = document.getElementById('greenWidth');
+            
+            if (isCircle) {
+                greenHeightSlider.disabled = true;
+                const width = parseInt(greenWidth.value);
+                const height = parseInt(greenHeight.value);
+                const diameter = Math.min(width, height);
+                
+                greenWidth.value = diameter;
+                greenHeight.value = diameter;
+                greenWidthValue.textContent = `${diameter}px`;
+                greenHeightValue.textContent = `${diameter}px`;
+                
+                greenWidthSlider.max = greenHeightSlider.max;
+                
+                if (greenBox) {
+                    greenBox.style.borderRadius = '50%';
+                }
+                
+                document.getElementById('greenRounded').checked = false;
+                document.getElementById('greenRounded').disabled = true;
+            } else {
+                greenHeightSlider.disabled = false;
+                greenWidthSlider.max = "1400";
+                
+                if (greenBox) {
+                    greenBox.style.borderRadius = '0px';
+                }
+                
+                document.getElementById('greenRounded').disabled = false;
+            }
+            updateGreen();
+            updateGreenCaption();
+        }
+
+        function toggleOrangeRounded() {
+            const orangeBox = document.getElementById('orangeBox');
+            const isRounded = document.getElementById('orangeRounded').checked;
+            const width = parseInt(orangeWidth.value);
+            const height = parseInt(orangeHeight.value);
+            const radius = Math.min(width, height) * 0.05;
+            
+            orangeBox.style.borderRadius = isRounded ? `${radius}px` : '0px';
+        }
+
+        function toggleOrangeCircle() {
+            const isCircle = document.getElementById('orangeCircle').checked;
+            const orangeHeightSlider = document.getElementById('orangeHeight');
+            const orangeWidthSlider = document.getElementById('orangeWidth');
+            
+            if (isCircle) {
+                orangeHeightSlider.disabled = true;
+                const width = parseInt(orangeWidth.value);
+                const height = parseInt(orangeHeight.value);
+                const diameter = Math.min(width, height);
+                
+                orangeWidth.value = diameter;
+                orangeHeight.value = diameter;
+                orangeWidthValue.textContent = `${diameter}px`;
+                orangeHeightValue.textContent = `${diameter}px`;
+                
+                orangeWidthSlider.max = orangeHeightSlider.max;
+                
+                if (orangeBox) {
+                    orangeBox.style.borderRadius = '50%';
+                }
+                
+                document.getElementById('orangeRounded').checked = false;
+                document.getElementById('orangeRounded').disabled = true;
+            } else {
+                orangeHeightSlider.disabled = false;
+                orangeWidthSlider.max = "1400";
+                
+                if (orangeBox) {
+                    orangeBox.style.borderRadius = '0px';
+                }
+                
+                document.getElementById('orangeRounded').disabled = false;
+            }
+            updateOrange();
+            updateOrangeCaption();
+        }
+
+        function toggleGreenCaption() {
+            const isVisible = document.getElementById('greenCaptionCheck').checked;
+            const captionElement = document.getElementById('greenCaption');
+            const sizeSlider = document.getElementById('greenCaptionSize');
+            
+            captionElement.style.display = isVisible ? 'grid' : 'none';
+            sizeSlider.disabled = !isVisible;
+            
+            if (isVisible) updateGreenCaption();
+        }
+
+        function toggleOrangeCaption() {
+            const isVisible = document.getElementById('orangeCaptionCheck').checked;
+            const captionElement = document.getElementById('orangeCaption');
+            const sizeSlider = document.getElementById('orangeCaptionSize');
+            
+            
+            captionElement.style.display = isVisible ? 'grid' : 'none';
+            sizeSlider.disabled = !isVisible;
+            
+            
+            if (isVisible) {
+                updateOrangeCaption();
+            }
+        }
+
+        function toggleGreenLockRatio() {
+            greenLockRatio = document.getElementById('greenLockRatio').checked;
+            if (greenLockRatio) {
+                greenLockedRatio = parseFloat(greenWidth.value) / parseFloat(greenHeight.value);
+            } else {
+                greenLockedRatio = null;
+            }
+        }
+
+        function toggleOrangeLockRatio() {
+            orangeLockRatio = document.getElementById('orangeLockRatio').checked;
+            if (orangeLockRatio) {
+                orangeLockedRatio = parseFloat(orangeWidth.value) / parseFloat(orangeHeight.value);
+            } else {
+                orangeLockedRatio = null;
+            }
+        }
+
+        function updateGreenCaption() {
+            const captionElement = document.getElementById('greenCaption');
+            const x = parseInt(greenPosX.value);
+            const y = parseInt(greenPosY.value);
+            const width = parseInt(greenWidth.value);
+            const height = parseInt(greenHeight.value);
+            const fontSize = parseInt(document.getElementById('greenCaptionSize').value);
+            
+            
+            const leftPos = x + width/2;
+            const topPos = y + height + 10;
+            
+            captionElement.style.left = `${leftPos}px`;
+            captionElement.style.top = `${topPos}px`;
+            captionElement.style.transform = 'translateX(-50%)';
+            captionElement.style.fontSize = `${fontSize}px`;
+            
+            
+            const contentElement = document.getElementById('textContent');
+            const contentComputedStyle = window.getComputedStyle(contentElement);
+            captionElement.style.fontFamily = contentComputedStyle.fontFamily;
+            captionElement.style.color = contentElement.style.color || contentComputedStyle.color;
+            captionElement.style.backgroundColor = contentElement.style.backgroundColor || contentComputedStyle.backgroundColor;
+            
+            
+            document.getElementById('greenCaptionSizeValue').textContent = `${fontSize}px`;
+            
+            
+            autoResizeTextarea(captionElement);
+        }
+
+        function updateOrangeCaption() {
+            const captionElement = document.getElementById('orangeCaption');
+            const x = parseInt(orangePosX.value);
+            const y = parseInt(orangePosY.value);
+            const width = parseInt(orangeWidth.value);
+            const height = parseInt(orangeHeight.value);
+            const fontSize = parseInt(document.getElementById('orangeCaptionSize').value);
+            
+            captionElement.style.left = `${x + width/2}px`;
+            captionElement.style.top = `${y + height + 10}px`;
+            captionElement.style.transform = 'translateX(-50%)';
+            captionElement.style.fontSize = `${fontSize}px`;
+            
+            const contentElement = document.getElementById('textContent');
+            const contentComputedStyle = window.getComputedStyle(contentElement);
+            captionElement.style.fontFamily = contentComputedStyle.fontFamily;
+            captionElement.style.color = contentElement.style.color || contentComputedStyle.color;
+            captionElement.style.backgroundColor = contentElement.style.backgroundColor || contentComputedStyle.backgroundColor;
+            
+            document.getElementById('orangeCaptionSizeValue').textContent = `${fontSize}px`;
+            
+            
+            autoResizeTextarea(captionElement);
+        }
+
+        function setHeaderPresetColor(bgColor, textColor) {
+            const header = document.getElementById('textHeader');
+            header.style.backgroundColor = bgColor;
+            header.style.color = textColor;
+            autoResizeTextarea(header);
+        }
+
+        function setContentPresetColor(bgColor, textColor) {
+            const content = document.getElementById('textContent');
+            content.style.backgroundColor = bgColor;
+            content.style.color = textColor;
+            autoResizeTextarea(content);
+            
+            if (document.getElementById('greenCaptionCheck').checked) {
+                updateGreenCaption();
+            }
+            if (document.getElementById('orangeCaptionCheck').checked) {
+                updateOrangeCaption();
+            }
+        }
+
+        function setSlidePresetColor(bgColor) {
+            document.getElementById('slideBackgroundColor').value = bgColor;
+            document.querySelector('.container').style.backgroundColor = bgColor;
+        }
+
+        document.getElementById('greenCaptionSize').addEventListener('input', updateGreenCaption);
+        document.getElementById('orangeCaptionSize').addEventListener('input', updateOrangeCaption);
+        
+        document.getElementById('greenCaption').addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+        document.getElementById('orangeCaption').addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+
+        document.getElementById('slideBackgroundColor').addEventListener('input', updateSlideBackground);
+        document.getElementById('popupOverlay').addEventListener('click', closeImagePopup);
+        document.getElementById('colorPopupOverlay').addEventListener('click', closeColorPopup);
+
+        scaleContainer();
+        updateGreen();
+        updateOrange();
+        updatePanelOpacity();
+        updateHeader();
+        updateContent();
+        
+        function loadAvailablePresets() {
+            fetch('/api/available-presets')
+                .then(response => response.json())
+                .then(data => {
+                    availablePresets = data.presets || [];
+                    availablePresets.sort((a, b) => a - b);
+                    updatePresetButtons();
+                    
+                    if (availablePresets.length > 0) {
+                        loadPreset(availablePresets[0]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd ładowania dostępnych presetów:', error);
+                    availablePresets = [];
+                    updatePresetButtons();
+                });
+        }
+        
+        loadAvailablePresets();
+        
+        function exportSlide() {
+            // Zbierz dane o elementach
+            const headerElement = document.getElementById('textHeader');
+            const contentElement = document.getElementById('textContent');
+            const greenElement = document.getElementById('greenBox');
+            const orangeElement = document.getElementById('orangeBox');
+            const greenCaptionElement = document.getElementById('greenCaption');
+            const orangeCaptionElement = document.getElementById('orangeCaption');
+            
+            const exportData = {
+                slide: {
+                    backgroundColor: document.getElementById('slideBackgroundColor').value || '#ffffff'
+                },
+                green: {
+                    w: parseInt(greenWidth.value),
+                    h: parseInt(greenHeight.value),
+                    x: parseInt(greenPosX.value),
+                    y: parseInt(greenPosY.value),
+                    hidden: !elementVisibility.green,
+                    circle: document.getElementById('greenCircle').checked,
+                    rounded: document.getElementById('greenRounded').checked,
+                    image: greenImageUrl ? greenImageUrl.replace('/img_slides/', '') : null,
+                    zoom: parseInt(greenZoom.value),
+                    captionEnabled: document.getElementById('greenCaptionCheck').checked,
+                    captionText: greenCaptionElement.textContent || '',
+                    captionSize: parseInt(document.getElementById('greenCaptionSize').value),
+                    captionBackgroundColor: greenCaptionElement.style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
+                    captionColor: greenCaptionElement.style.color || contentElement.style.color || '#000000'
+                },
+                orange: {
+                    w: parseInt(orangeWidth.value),
+                    h: parseInt(orangeHeight.value),
+                    x: parseInt(orangePosX.value),
+                    y: parseInt(orangePosY.value),
+                    hidden: !elementVisibility.orange,
+                    circle: document.getElementById('orangeCircle').checked,
+                    rounded: document.getElementById('orangeRounded').checked,
+                    image: orangeImageUrl ? orangeImageUrl.replace('/img_slides/', '') : null,
+                    zoom: parseInt(orangeZoom.value),
+                    captionEnabled: document.getElementById('orangeCaptionCheck').checked,
+                    captionText: orangeCaptionElement.textContent || '',
+                    captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
+                    captionBackgroundColor: orangeCaptionElement.style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
+                    captionColor: orangeCaptionElement.style.color || contentElement.style.color || '#000000'
+                },
+                header: {
+                    x: parseInt(headerPosX.value),
+                    y: parseInt(headerPosY.value),
+                    fontSize: parseInt(headerFontSize.value),
+                    fontFamily: headerFontFamily.value,
+                    text: headerElement.textContent || headerElement.innerText || 'Nagłówek',
+                    bold: headerStyles.bold,
+                    italic: headerStyles.italic,
+                    underline: headerStyles.underline,
+                    hidden: !elementVisibility.header,
+                    backgroundColor: headerElement.style.backgroundColor || '#ffeb3b',
+                    color: headerElement.style.color || '#000000',
+                    marginLeft: parseInt(headerMarginLeft.value),
+                    marginRight: parseInt(headerMarginRight.value)
+                },
+                content: {
+                    x: parseInt(contentPosX.value),
+                    y: parseInt(contentPosY.value),
+                    fontSize: parseInt(contentFontSize.value),
+                    fontFamily: contentFontFamily.value,
+                    text: contentElement.textContent || contentElement.innerText || 'Treść slajdu',
+                    bold: contentStyles.bold,
+                    italic: contentStyles.italic,
+                    underline: contentStyles.underline,
+                    hidden: !elementVisibility.content,
+                    backgroundColor: contentElement.style.backgroundColor || '#81c784',
+                    color: contentElement.style.color || '#000000',
+                    marginLeft: parseInt(contentMarginLeft.value),
+                    marginRight: parseInt(contentMarginRight.value)
+                }
+            };
+            
+            // Wyślij dane do serwera
+            fetch('/api/export-slide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(exportData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Slajd wyeksportowany do: ${data.path}`);
+                } else {
+                    alert('Błąd eksportu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Błąd połączenia z serwerem');
+            });
+        }
+    </script>
+</body>
+</html>

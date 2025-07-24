@@ -1,0 +1,51 @@
+{
+    "name": "Preset 4",
+    "description": "Preset 4",
+    "green": {
+        "w": 537,
+        "h": 699,
+        "x": 945,
+        "y": 0,
+        "hidden": false,
+        "circle": false,
+        "lockRatio": true,
+        "captionEnabled": false,
+        "captionText": "Podpis",
+        "captionSize": 12
+    },
+    "orange": {
+        "w": 644,
+        "h": 430,
+        "x": 510,
+        "y": 371,
+        "hidden": false,
+        "circle": false,
+        "lockRatio": true,
+        "captionEnabled": false,
+        "captionText": "Podpis",
+        "captionSize": 12
+    },
+    "header": {
+        "x": 0,
+        "y": 50,
+        "fontSize": 56,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": false
+    },
+    "content": {
+        "x": 67,
+        "y": 150,
+        "fontSize": 25,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": false
+    },
+    "slide": {
+        "backgroundColor": "#ffffff"
+    }
+}

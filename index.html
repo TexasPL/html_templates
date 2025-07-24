@@ -68,10 +68,152 @@
         .screenshot-btn.success {
             background-color: #4CAF50;
         }
+        .new-slide-btn {
+            background-color: #9C27B0;
+        }
+        .new-slide-btn:hover:not(:disabled) {
+            background-color: #7B1FA2;
+        }
         @keyframes pulse {
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .image-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .image-option {
+            position: relative;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+        .image-option:hover {
+            border-color: #2196F3;
+        }
+        .image-option.selected {
+            border-color: #4CAF50;
+            background-color: #E8F5E8;
+        }
+        .image-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-option .image-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 4px;
+            font-size: 10px;
+            text-align: center;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #1976D2;
+        }
+        .btn-secondary {
+            background-color: #666;
+            color: white;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #555;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -81,25 +223,76 @@
         <button id="prev" class="button" title="Poprzedni slajd">‹</button>
         <button id="next" class="button" title="Następny slajd">›</button>
         <button id="screenshot" class="button screenshot-btn" title="Zapisz screenshot">📷</button>
+        <button id="new-slide" class="button new-slide-btn" title="Nowy slajd">+</button>
+        <button id="load-p1" class="button" title="Załaduj slajd z p1" style="background-color: #FF5722;">P1</button>
+    </div>
+    
+    <!-- Modal do tworzenia nowego slajdu -->
+    <div id="new-slide-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h2>Utwórz nowy slajd</h2>
+            
+            <div class="form-group">
+                <label for="preset-select">Szablon:</label>
+                <select id="preset-select">
+                    <option value="preset-1">Preset 1 - Domyślny układ</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="header-text">Nagłówek:</label>
+                <input type="text" id="header-text" placeholder="Wpisz nagłówek slajdu" value="Nagłówek">
+            </div>
+            
+            <div class="form-group">
+                <label for="content-text">Treść:</label>
+                <textarea id="content-text" placeholder="Wpisz treść slajdu">Treść slajdu</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="bg-image">Obraz tła:</label>
+                <div id="image-selector" class="image-selector">
+                    <div class="image-loading">Ładowanie obrazów...</div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-btn">Anuluj</button>
+                <button type="button" class="btn btn-primary" id="create-btn">Utwórz slajd</button>
+            </div>
+        </div>
     </div>
     <script>
         const windowDiv = document.getElementById('slide-window');
         const prevButton = document.getElementById('prev');
         const nextButton = document.getElementById('next');
         const screenshotButton = document.getElementById('screenshot');
+        const newSlideButton = document.getElementById('new-slide');
+        const modal = document.getElementById('new-slide-modal');
+        const modalClose = document.getElementById('modal-close');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const createBtn = document.getElementById('create-btn');
+        const imageSelector = document.getElementById('image-selector');
         let currentSlide = 1;
         let totalSlides;
         let screenshotStatuses = {}; // Przechowuje stan zapisanych slajdów
+        let availableImages = [];
+        let selectedImage = null;
+        let currentSlideSource = 'normal'; // 'normal' lub 'p1', 'p2', etc.
 
-        fetch('number.txt')
+        fetch('number.txt?' + Date.now())
             .then(response => response.text())
             .then(number => {
+                console.log('Zawartość number.txt:', number);
                 totalSlides = parseInt(number);
+                console.log('Liczba slajdów (totalSlides):', totalSlides);
                 loadSlide(currentSlide);
             })
             .catch(error => console.error('Błąd podczas wczytywania pliku number.txt:', error));
 
         function loadSlide(slideNumber) {
+            currentSlideSource = 'normal';
             fetch(`slides/s${slideNumber}.html`)
                 .then(response => response.text())
                 .then(html => {
@@ -111,6 +304,7 @@
         }
 
         function updateButtonVisibility() {
+            console.log(`Aktualizacja przycisków: currentSlide=${currentSlide}, totalSlides=${totalSlides}`);
             prevButton.disabled = (currentSlide === 1);
             nextButton.disabled = (currentSlide === totalSlides);
         }
@@ -150,8 +344,9 @@
             screenshotButton.disabled = true;
             screenshotButton.title = 'Zapisywanie...';
             
-            // Wyślij aktualny numer slajdu
-            fetch(`/screenshot?slide=${currentSlide}`)
+            // Wyślij informację o aktualnym slajdzie (z p1 lub normalnym)
+            const slideParam = currentSlideSource === 'normal' ? currentSlide : currentSlideSource;
+            fetch(`/screenshot?slide=${slideParam}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -187,6 +382,175 @@
                     screenshotButton.disabled = false;
                 });
         });
+
+        // Modal functionality
+        newSlideButton.addEventListener('click', () => {
+            // Otwórz edytor template w nowej karcie
+            window.open('/templates/template-1.html', '_blank');
+        });
+
+        modalClose.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Zamknij modal po kliknięciu poza nim
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Ładowanie dostępnych obrazów
+        function loadAvailableImages() {
+            fetch('/api/template-images')
+                .then(response => response.json())
+                .then(data => {
+                    availableImages = data.images || [];
+                    renderImageSelector();
+                })
+                .catch(error => {
+                    console.error('Błąd ładowania obrazów:', error);
+                    imageSelector.innerHTML = '<div style="text-align: center; color: #666;">Błąd ładowania obrazów</div>';
+                });
+        }
+
+        // Renderowanie selektora obrazów
+        function renderImageSelector() {
+            if (availableImages.length === 0) {
+                imageSelector.innerHTML = '<div style="text-align: center; color: #666;">Brak dostępnych obrazów</div>';
+                return;
+            }
+
+            imageSelector.innerHTML = availableImages.map(image => `
+                <div class="image-option" data-image="${image}">
+                    <img src="/img_slides/${image}" alt="${image}" onerror="this.style.display='none'">
+                    <div class="image-name">${image}</div>
+                </div>
+            `).join('');
+
+            // Dodaj event listeners do opcji obrazów
+            imageSelector.querySelectorAll('.image-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    // Usuń poprzednie zaznaczenie
+                    imageSelector.querySelectorAll('.image-option').forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Zaznacz obecny
+                    option.classList.add('selected');
+                    selectedImage = option.dataset.image;
+                });
+            });
+        }
+
+        // Tworzenie nowego slajdu
+        createBtn.addEventListener('click', () => {
+            const headerText = document.getElementById('header-text').value;
+            const contentText = document.getElementById('content-text').value;
+            const preset = document.getElementById('preset-select').value;
+
+            if (!headerText.trim() || !contentText.trim()) {
+                alert('Wypełnij wszystkie pola tekstowe');
+                return;
+            }
+
+            // Ustaw stan ładowania
+            createBtn.disabled = true;
+            createBtn.textContent = 'Tworzenie...';
+            modal.classList.add('loading');
+
+            const requestData = {
+                preset: preset,
+                header: headerText,
+                content: contentText,
+                image: selectedImage
+            };
+
+            fetch('/api/create-slide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Zaktualizuj liczbę slajdów
+                    totalSlides = data.slide_number;
+                    
+                    // Przejdź do nowego slajdu
+                    currentSlide = data.slide_number;
+                    loadSlide(currentSlide);
+                    
+                    // Zamknij modal
+                    modal.style.display = 'none';
+                    
+                    // Resetuj formularz
+                    document.getElementById('header-text').value = 'Nagłówek';
+                    document.getElementById('content-text').value = 'Treść slajdu';
+                    selectedImage = null;
+                    imageSelector.querySelectorAll('.image-option').forEach(opt => opt.classList.remove('selected'));
+                    
+                    alert(`Slajd ${data.slide_number} został utworzony!`);
+                } else {
+                    alert('Błąd tworzenia slajdu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Błąd:', error);
+                alert('Błąd połączenia z serwerem');
+            })
+            .finally(() => {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Utwórz slajd';
+                modal.classList.remove('loading');
+            });
+        });
+
+        // Aktualizuj całkowitą liczbę slajdów po każdym załadowaniu
+        function refreshSlideCount() {
+            fetch('number.txt?' + Date.now())
+                .then(response => response.text())
+                .then(number => {
+                    console.log('refreshSlideCount - Zawartość number.txt:', number);
+                    totalSlides = parseInt(number);
+                    console.log('refreshSlideCount - Liczba slajdów (totalSlides):', totalSlides);
+                    updateButtonVisibility();
+                })
+                .catch(error => console.error('Błąd odświeżania liczby slajdów:', error));
+        }
+
+        // Załaduj slajd z katalogu p1
+        function loadSlideFromP1() {
+            currentSlideSource = 'p1';
+            fetch('slides/p1/s1.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Slajd p1/s1.html nie istnieje');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    windowDiv.innerHTML = html;
+                    // Wyłącz przyciski nawigacji dla slajdu z p1
+                    prevButton.disabled = true;
+                    nextButton.disabled = true;
+                    // Resetuj status screenshot
+                    screenshotButton.className = 'button screenshot-btn';
+                    screenshotButton.innerHTML = '📷';
+                    screenshotButton.title = 'Zapisz screenshot';
+                })
+                .catch(error => {
+                    console.error('Błąd ładowania slajdu z p1:', error);
+                    alert('Nie można załadować slajdu z p1. Sprawdź czy istnieje slides/p1/s1.html');
+                });
+        }
+
+        // Event listener dla przycisku P1
+        document.getElementById('load-p1').addEventListener('click', loadSlideFromP1);
     </script>
 </body>
 </html>

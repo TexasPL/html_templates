@@ -1,0 +1,51 @@
+{
+    "name": "Preset 3",
+    "description": "Preset 3",
+    "green": {
+        "w": 500,
+        "h": 500,
+        "x": 901,
+        "y": 90,
+        "hidden": false,
+        "circle": true,
+        "lockRatio": true,
+        "captionEnabled": true,
+        "captionText": "Podpis",
+        "captionSize": 30
+    },
+    "orange": {
+        "w": 500,
+        "h": 500,
+        "x": 130,
+        "y": 90,
+        "hidden": false,
+        "circle": true,
+        "lockRatio": true,
+        "captionEnabled": true,
+        "captionText": "Podpis",
+        "captionSize": 30
+    },
+    "header": {
+        "x": 50,
+        "y": 50,
+        "fontSize": 32,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": true
+    },
+    "content": {
+        "x": 50,
+        "y": 150,
+        "fontSize": 18,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": true
+    },
+    "slide": {
+        "backgroundColor": "#ffffff"
+    }
+}
