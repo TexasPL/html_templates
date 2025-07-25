@@ -154,6 +154,10 @@
                     <input type="checkbox" id="orangeCircle" onchange="toggleOrangeCircle()">
                     Koło
                 </label>
+                <label class="visibility-control">
+                    <input type="checkbox" id="orangeHtmlSnippet" onchange="toggleOrangeHtmlSnippet()">
+                    Dodaj HTML
+                </label>
             </div>
             <div class="control-row">
                 <label>Zoom img:</label>
@@ -1020,6 +1024,8 @@
             } else {
                 document.getElementById('orangeCaption').style.color = '#000000';
             }
+            // Zawsze ustaw htmlSnippet checkbox (domyślnie false dla starych presetów)
+            document.getElementById('orangeHtmlSnippet').checked = preset.orange.htmlSnippet || false;
             
             headerPosX.value = preset.header.x;
             headerPosY.value = preset.header.y;
@@ -1118,6 +1124,9 @@
                 updateOrangeCaption();
             }
             
+            // Zastosuj podgląd snippet zgodnie ze stanem checkbox (true/false)
+            toggleOrangeHtmlSnippet();
+            
         }
 
         window.addEventListener('resize', () => {
@@ -1211,7 +1220,9 @@
                     captionText: document.getElementById('orangeCaption').textContent || "Podpis",
                     captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
                     captionBackgroundColor: document.getElementById('orangeCaption').style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
-                    captionColor: document.getElementById('orangeCaption').style.color || contentElement.style.color || '#000000'
+                    captionColor: document.getElementById('orangeCaption').style.color || contentElement.style.color || '#000000',
+                    htmlSnippet: document.getElementById('orangeHtmlSnippet').checked,
+                    snippetFile: 'box1.html'
                 },
                 header: {
                     x: parseInt(headerPosX.value),
@@ -1724,6 +1735,43 @@ Preset JSON:
             updateOrangeCaption();
         }
 
+        function toggleOrangeHtmlSnippet() {
+            const isHtmlSnippet = document.getElementById('orangeHtmlSnippet').checked;
+            
+            const orangeBox = document.getElementById('orangeBox');
+            
+            if (isHtmlSnippet) {
+                // Zastąp zawartość orange box podglądem tabeli
+                orangeBox.innerHTML = `
+                    <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
+                        <tr>
+                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
+                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
+                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
+                        </tr>
+                    </table>
+                `;
+                // Wyłącz obrazy tła dla podglądu
+                orangeBox.style.backgroundImage = 'none';
+                orangeBox.style.backgroundColor = 'transparent';
+            } else {
+                // Przywróć standardowy orange box
+                orangeBox.innerHTML = '';
+                orangeBox.style.backgroundColor = '#ff9800';
+                // Przywróć obraz jeśli był
+                if (orangeImageUrl) {
+                    orangeBox.style.backgroundImage = `url('${orangeImageUrl}')`;
+                    orangeBox.style.backgroundSize = `${orangeZoom.value}%`;
+                    orangeBox.style.backgroundPosition = 'center';
+                }
+            }
+            
+            updateOrange();
+        }
+
         function toggleGreenCaption() {
             const isVisible = document.getElementById('greenCaptionCheck').checked;
             const captionElement = document.getElementById('greenCaption');
@@ -1901,6 +1949,9 @@ Preset JSON:
             const greenCaptionElement = document.getElementById('greenCaption');
             const orangeCaptionElement = document.getElementById('orangeCaption');
             
+            // Sprawdź stan orange HTML snippet
+            const orangeHtmlSnippet = document.getElementById('orangeHtmlSnippet').checked;
+            
             const exportData = {
                 slide: {
                     backgroundColor: document.getElementById('slideBackgroundColor').value || '#ffffff'
@@ -1935,7 +1986,9 @@ Preset JSON:
                     captionText: orangeCaptionElement.textContent || '',
                     captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
                     captionBackgroundColor: orangeCaptionElement.style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
-                    captionColor: orangeCaptionElement.style.color || contentElement.style.color || '#000000'
+                    captionColor: orangeCaptionElement.style.color || contentElement.style.color || '#000000',
+                    htmlSnippet: document.getElementById('orangeHtmlSnippet').checked,
+                    snippetFile: 'box1.html'
                 },
                 header: {
                     x: parseInt(headerPosX.value),

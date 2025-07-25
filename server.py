@@ -329,6 +329,31 @@ class SlideScreenshotApp:
                     return f"background-image: url('slides/{slide_dir}/{image_name}'); background-size: {zoom}%; background-position: center; background-repeat: no-repeat;"
                 return ""
             
+            def load_html_snippet(snippet_file):
+                """Ładuje snippet HTML z foldera presets"""
+                try:
+                    snippet_path = os.path.join('templates/presets', snippet_file)
+                    if os.path.exists(snippet_path):
+                        with open(snippet_path, 'r', encoding='utf-8') as f:
+                            return f.read()
+                    return ""
+                except Exception as e:
+                    print(f"Błąd ładowania snippetu {snippet_file}: {e}")
+                    return ""
+            
+            def parse_snippet_content(snippet_html):
+                """Parsuje snippet HTML i wydziela CSS oraz HTML"""
+                import re
+                
+                # Wyciągnij CSS z <style>
+                css_match = re.search(r'<style>(.*?)</style>', snippet_html, re.DOTALL)
+                css_content = css_match.group(1).strip() if css_match else ""
+                
+                # Wyciągnij HTML bez <style>
+                html_content = re.sub(r'<style>.*?</style>', '', snippet_html, flags=re.DOTALL).strip()
+                
+                return css_content, html_content
+            
             # Generuj style CSS
             styles = f"""
                 body {{
@@ -382,21 +407,59 @@ class SlideScreenshotApp:
             
             # Orange box  
             if not data['orange']['hidden']:
-                styles += f"""
-                .orange-box {{
-                    position: absolute;
-                    left: {data['orange']['x']}px;
-                    top: {data['orange']['y']}px;
-                    width: {data['orange']['w']}px;
-                    height: {data['orange']['h']}px;
-                    background-color: #ff9800;
-                    border-radius: {get_border_radius(data['orange'])};
-                    {get_background_image(data['orange']['image'], data['orange']['zoom'])}
-                }}
-                """
+                # Sprawdź czy używa HTML snippet
+                if data['orange'].get('htmlSnippet') and data['orange'].get('snippetFile'):
+                    
+                    # Załaduj i parsuj snippet
+                    snippet_html = load_html_snippet(data['orange']['snippetFile'])
+                    if snippet_html:
+                        snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
+                        
+                        # Dodaj podstawowe style dla orange-box z pozycjonowaniem
+                        styles += f"""
+                        .orange-box {{
+                            position: absolute;
+                            left: {data['orange']['x']}px;
+                            top: {data['orange']['y']}px;
+                            width: {data['orange']['w']}px;
+                            height: {data['orange']['h']}px;
+                            border-radius: {get_border_radius(data['orange'])};
+                        }}
+                        """
+                        
+                        # Dodaj CSS ze snippetu
+                        styles += snippet_css
+                    else:
+                        # Fallback - zwykły orange box
+                        styles += f"""
+                        .orange-box {{
+                            position: absolute;
+                            left: {data['orange']['x']}px;
+                            top: {data['orange']['y']}px;
+                            width: {data['orange']['w']}px;
+                            height: {data['orange']['h']}px;
+                            background-color: #ff9800;
+                            border-radius: {get_border_radius(data['orange'])};
+                            {get_background_image(data['orange']['image'], data['orange']['zoom'])}
+                        }}
+                        """
+                else:
+                    # Standardowy orange box
+                    styles += f"""
+                    .orange-box {{
+                        position: absolute;
+                        left: {data['orange']['x']}px;
+                        top: {data['orange']['y']}px;
+                        width: {data['orange']['w']}px;
+                        height: {data['orange']['h']}px;
+                        background-color: #ff9800;
+                        border-radius: {get_border_radius(data['orange'])};
+                        {get_background_image(data['orange']['image'], data['orange']['zoom'])}
+                    }}
+                    """
                 
-                # Orange caption
-                if data['orange']['captionEnabled'] and data['orange']['captionText']:
+                # Orange caption (tylko jeśli nie używa snippet)
+                if not data['orange'].get('htmlSnippet') and data['orange']['captionEnabled'] and data['orange']['captionText']:
                     caption_x = data['orange']['x'] + data['orange']['w'] // 2
                     caption_y = data['orange']['y'] + data['orange']['h'] + 10
                     styles += f"""
@@ -470,9 +533,23 @@ class SlideScreenshotApp:
                     html_body += f'<div class="green-caption">{data["green"]["captionText"]}</div>'
             
             if not data['orange']['hidden']:
-                html_body += '<div class="orange-box"></div>'
-                if data['orange']['captionEnabled'] and data['orange']['captionText']:
-                    html_body += f'<div class="orange-caption">{data["orange"]["captionText"]}</div>'
+                # Sprawdź czy używa HTML snippet
+                if data['orange'].get('htmlSnippet') and data['orange'].get('snippetFile'):
+                    # Załaduj snippet HTML
+                    snippet_html = load_html_snippet(data['orange']['snippetFile'])
+                    if snippet_html:
+                        snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
+                        # Dodaj div z klasą orange-box-snippet i wewnętrznym HTML ze snippetu
+                        html_body += f'<div class="orange-box orange-box-snippet">{snippet_html_content}</div>'
+                    else:
+                        # Fallback - zwykły orange box
+                        html_body += '<div class="orange-box"></div>'
+                else:
+                    # Standardowy orange box
+                    html_body += '<div class="orange-box"></div>'
+                    # Caption tylko dla standardowego orange box
+                    if data['orange']['captionEnabled'] and data['orange']['captionText']:
+                        html_body += f'<div class="orange-caption">{data["orange"]["captionText"]}</div>'
             
             if not data['header']['hidden']:
                 html_body += f'<div class="header">{data["header"]["text"]}</div>'

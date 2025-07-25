@@ -17,19 +17,21 @@
         "captionColor": "rgb(0, 0, 0)"
     },
     "orange": {
-        "w": 644,
-        "h": 430,
-        "x": 510,
-        "y": 371,
+        "w": 491,
+        "h": 491,
+        "x": 118,
+        "y": 301,
         "hidden": false,
         "circle": false,
-        "rounded": false,
-        "lockRatio": true,
+        "rounded": true,
+        "lockRatio": false,
         "captionEnabled": false,
         "captionText": "Podpis",
         "captionSize": 12,
         "captionBackgroundColor": "rgb(129, 199, 132)",
-        "captionColor": "rgb(0, 0, 0)"
+        "captionColor": "rgb(0, 0, 0)",
+        "htmlSnippet": true,
+        "snippetFile": "box1.html"
     },
     "header": {
         "x": 0,
