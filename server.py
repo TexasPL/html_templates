@@ -373,21 +373,59 @@ class SlideScreenshotApp:
             
             # Green box
             if not data['green']['hidden']:
-                styles += f"""
-                .green-box {{
-                    position: absolute;
-                    left: {data['green']['x']}px;
-                    top: {data['green']['y']}px;
-                    width: {data['green']['w']}px;
-                    height: {data['green']['h']}px;
-                    background-color: #81c784;
-                    border-radius: {get_border_radius(data['green'])};
-                    {get_background_image(data['green']['image'], data['green']['zoom'])}
-                }}
-                """
+                # Sprawdź czy używa HTML snippet
+                if data['green'].get('htmlSnippet') and data['green'].get('snippetFile'):
+                    
+                    # Załaduj i parsuj snippet
+                    snippet_html = load_html_snippet(data['green']['snippetFile'])
+                    if snippet_html:
+                        snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
+                        
+                        # Dodaj podstawowe style dla green-box z pozycjonowaniem
+                        styles += f"""
+                        .green-box {{
+                            position: absolute;
+                            left: {data['green']['x']}px;
+                            top: {data['green']['y']}px;
+                            width: {data['green']['w']}px;
+                            height: {data['green']['h']}px;
+                            border-radius: {get_border_radius(data['green'])};
+                        }}
+                        """
+                        
+                        # Dodaj CSS ze snippetu
+                        styles += snippet_css
+                    else:
+                        # Fallback - zwykły green box
+                        styles += f"""
+                        .green-box {{
+                            position: absolute;
+                            left: {data['green']['x']}px;
+                            top: {data['green']['y']}px;
+                            width: {data['green']['w']}px;
+                            height: {data['green']['h']}px;
+                            background-color: #81c784;
+                            border-radius: {get_border_radius(data['green'])};
+                            {get_background_image(data['green']['image'], data['green']['zoom'])}
+                        }}
+                        """
+                else:
+                    # Standardowy green box
+                    styles += f"""
+                    .green-box {{
+                        position: absolute;
+                        left: {data['green']['x']}px;
+                        top: {data['green']['y']}px;
+                        width: {data['green']['w']}px;
+                        height: {data['green']['h']}px;
+                        background-color: #81c784;
+                        border-radius: {get_border_radius(data['green'])};
+                        {get_background_image(data['green']['image'], data['green']['zoom'])}
+                    }}
+                    """
                 
-                # Green caption
-                if data['green']['captionEnabled'] and data['green']['captionText']:
+                # Green caption (tylko jeśli nie używa snippet)
+                if not data['green'].get('htmlSnippet') and data['green']['captionEnabled'] and data['green']['captionText']:
                     caption_x = data['green']['x'] + data['green']['w'] // 2
                     caption_y = data['green']['y'] + data['green']['h'] + 10
                     styles += f"""
@@ -528,9 +566,23 @@ class SlideScreenshotApp:
             
             # Dodaj elementy
             if not data['green']['hidden']:
-                html_body += '<div class="green-box"></div>'
-                if data['green']['captionEnabled'] and data['green']['captionText']:
-                    html_body += f'<div class="green-caption">{data["green"]["captionText"]}</div>'
+                # Sprawdź czy używa HTML snippet
+                if data['green'].get('htmlSnippet') and data['green'].get('snippetFile'):
+                    # Załaduj snippet HTML
+                    snippet_html = load_html_snippet(data['green']['snippetFile'])
+                    if snippet_html:
+                        snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
+                        # Dodaj div z klasą green-box-snippet i wewnętrznym HTML ze snippetu
+                        html_body += f'<div class="green-box green-box-snippet">{snippet_html_content}</div>'
+                    else:
+                        # Fallback - zwykły green box
+                        html_body += '<div class="green-box"></div>'
+                else:
+                    # Standardowy green box
+                    html_body += '<div class="green-box"></div>'
+                    # Caption tylko dla standardowego green box
+                    if data['green']['captionEnabled'] and data['green']['captionText']:
+                        html_body += f'<div class="green-caption">{data["green"]["captionText"]}</div>'
             
             if not data['orange']['hidden']:
                 # Sprawdź czy używa HTML snippet
@@ -636,7 +688,7 @@ class SlideScreenshotApp:
                 """)
                 time.sleep(0.2)
             
-            # Wymuszenie dokładnych rozmiarów
+            # Wymuszenie dokładnych rozmiarów + fix dla tabel snippetów
             self.driver.execute_script("""
                 const slideWindow = document.getElementById('slide-window');
                 slideWindow.style.width = '1536px';
@@ -647,23 +699,36 @@ class SlideScreenshotApp:
                 slideWindow.style.backgroundColor = 'white';
                 slideWindow.style.position = 'relative';
                 
-                // Wymuszenie rozmiaru dla całej zawartości
-                const allElements = slideWindow.querySelectorAll('*');
-                allElements.forEach(el => {
-                    if (el.tagName === 'TABLE') {
-                        el.style.width = '100%';
-                        el.style.height = '100%';
-                        el.style.minHeight = '864px';
-                    }
-                    if (el.tagName === 'TD') {
-                        el.style.width = '100%';
-                        el.style.height = '100%';
-                        el.style.minHeight = '864px';
-                    }
+                // Fix specjalny dla snippet tables
+                const snippetTables = slideWindow.querySelectorAll('.orange-box-snippet table, .green-box-snippet table');
+                snippetTables.forEach(table => {
+                    table.style.display = 'table';
+                    table.style.width = '100%';
+                    table.style.height = '100%';
+                    table.style.tableLayout = 'fixed';
+                    table.style.borderCollapse = 'collapse';
+                    
+                    // Force rows to show
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach((row, index) => {
+                        row.style.display = 'table-row';
+                        row.style.height = '50%';
+                        row.style.minHeight = '50%';
+                    });
+                    
+                    // Force cells to show
+                    const cells = table.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        cell.style.display = 'table-cell';
+                        cell.style.width = '50%';
+                        cell.style.height = '50%';
+                        cell.style.minHeight = '50%';
+                        cell.style.verticalAlign = 'middle';
+                    });
                 });
             """)
             
-            time.sleep(0.15)  # Skrócone z 0.3s
+            time.sleep(0.5)  # Zwiększone dla stabilności layout tabeli
             
             # Screenshot całej strony
             screenshot_png = self.driver.get_screenshot_as_png()

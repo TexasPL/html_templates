@@ -1,0 +1,69 @@
+{
+    "name": "Preset 4",
+    "description": "Preset 4",
+    "green": {
+        "w": 537,
+        "h": 537,
+        "x": 543,
+        "y": 0,
+        "hidden": false,
+        "circle": true,
+        "rounded": false,
+        "lockRatio": true,
+        "captionEnabled": false,
+        "captionText": "Podpis",
+        "captionSize": 12,
+        "captionBackgroundColor": "rgb(129, 199, 132)",
+        "captionColor": "rgb(0, 0, 0)",
+        "htmlSnippet": true,
+        "snippetFile": "box2.html"
+    },
+    "orange": {
+        "w": 491,
+        "h": 491,
+        "x": 118,
+        "y": 301,
+        "hidden": false,
+        "circle": false,
+        "rounded": true,
+        "lockRatio": false,
+        "captionEnabled": false,
+        "captionText": "Podpis",
+        "captionSize": 12,
+        "captionBackgroundColor": "rgb(129, 199, 132)",
+        "captionColor": "rgb(0, 0, 0)",
+        "htmlSnippet": true,
+        "snippetFile": "box1.html"
+    },
+    "header": {
+        "x": 0,
+        "y": 50,
+        "fontSize": 56,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": false,
+        "backgroundColor": "rgb(255, 235, 59)",
+        "color": "rgb(0, 0, 0)",
+        "marginLeft": 103,
+        "marginRight": 8
+    },
+    "content": {
+        "x": 67,
+        "y": 150,
+        "fontSize": 25,
+        "fontFamily": "Arial, sans-serif",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "hidden": false,
+        "backgroundColor": "rgb(129, 199, 132)",
+        "color": "rgb(0, 0, 0)",
+        "marginLeft": 92,
+        "marginRight": 8
+    },
+    "slide": {
+        "backgroundColor": "#ffffff"
+    }
+}

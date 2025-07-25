@@ -76,7 +76,8 @@ Plik zawiera jedną liczbę określającą ilość dostępnych slajdów. Aplikac
 │   └── presets/           # Zapisane presety układów + HTML snippety
 │       ├── preset-1.json  # Preset koła
 │       ├── preset-2.json  # Preset prostokąty
-│       └── box1.html      # HTML snippet - tabela 2x2  
+│       ├── box1.html      # HTML snippet - tabela 2x2 (pole pomarańczowe)
+│       └── box2.html      # HTML snippet - tabela 2x2 (pole zielone)  
 ├── slides/                # Slajdy HTML + obrazy
 │   ├── s1.html, s2.html   # Standardowe slajdy
 │   ├── p1/, p2/           # Eksportowane template'y
@@ -104,25 +105,29 @@ Plik zawiera jedną liczbę określającą ilość dostępnych slajdów. Aplikac
 
 ## Opis funkcji
 
-System HTML Snippetów umożliwia wstawianie niestandardowego HTML/CSS do pomarańczowego pola bez komplikowania głównego interfejsu. Zamiast dodawać dziesiątki nowych opcji, wykorzystujemy elastyczne pliki HTML z własnymi stylami.
+System HTML Snippetów umożliwia wstawianie niestandardowego HTML/CSS do pól kolorowych (pomarańczowego i zielonego) bez komplikowania głównego interfejsu. Zamiast dodawać dziesiątki nowych opcji, wykorzystujemy elastyczne pliki HTML z własnymi stylami.
 
 ## Jak działa
 
 ### 1. **W edytorze (template-1.html)**
-- **Checkbox "Dodaj HTML"** przy pomarańczowym polu
-- **Podgląd na żywo** - tabela 2x2 zastępuje standardowy orange box
+- **Checkbox "Dodaj HTML"** przy pomarańczowym i zielonym polu
+- **Podgląd na żywo** - tabela 2x2 zastępuje standardowe pola
 - **Zachowuje właściwości** pola (pozycja, rozmiar, kształt)
 - **Zapis w presetach** - stan checkbox zapisany w JSON
 
 ### 2. **Podczas eksportu**
 - **Backend parsing** snippet HTML → wydzielenie CSS i HTML
 - **Wstrzykiwanie CSS** inline do wygenerowanego slajdu  
-- **Zamiana zawartości** orange box na HTML ze snippetu
+- **Zamiana zawartości** pól kolorowych na HTML ze snippetu
 - **Standalone HTML** - pełna funkcjonalność bez zewnętrznych zależności
 
 ## Format snippetu
 
-### Struktura pliku (`templates/presets/box1.html`)
+### Dostępne snippety
+- **`box1.html`** - snippet dla pola pomarańczowego (klasa `.orange-box-snippet`)
+- **`box2.html`** - snippet dla pola zielonego (klasa `.green-box-snippet`)
+
+### Struktura pliku snippetu (przykład `templates/presets/box1.html`)
 
 ```html
 <style>
@@ -174,39 +179,47 @@ System HTML Snippetów umożliwia wstawianie niestandardowego HTML/CSS do pomara
 ### Wymagania techniczne
 
 1. **CSS w tagu `<style>`** - automatycznie wydzielany przez parser
-2. **Klasa `.orange-box-snippet`** - nadpisuje domyślne style orange box
+2. **Dedykowane klasy** - `.orange-box-snippet` lub `.green-box-snippet`
 3. **Względne jednostki** (`%`, `em`) - dostosowanie do rozmiaru pola
 4. **Style inline dopuszczalne** - dla prostych przypadków
+5. **Explicit table display** - `display: table/table-row/table-cell` dla stabilności w screenshotach
 
 ### Mechanizm wstrzykiwania
 
 ```javascript
-// Frontend - podgląd w edytorze
-function toggleOrangeHtmlSnippet() {
+// Frontend - podgląd w edytorze (przykład dla zielonego pola)
+function toggleGreenHtmlSnippet() {
     if (isHtmlSnippet) {
-        orangeBox.innerHTML = `<table>...</table>`;  // Podgląd
-        orangeBox.style.backgroundColor = 'transparent';
+        greenBox.innerHTML = `<table>...</table>`;  // Podgląd
+        greenBox.style.backgroundColor = 'transparent';
     } else {
-        orangeBox.innerHTML = '';  // Przywróć standardowy
-        orangeBox.style.backgroundColor = '#ff9800';
+        greenBox.innerHTML = '';  // Przywróć standardowy
+        greenBox.style.backgroundColor = '#81c784';
     }
 }
 ```
 
 ```python
-# Backend - generowanie HTML
+# Backend - generowanie HTML (obsługa obu pól)
 def generate_slide_html(data, slide_dir):
+    # Obsługa zielonego pola
+    if data['green'].get('htmlSnippet'):
+        snippet_css, snippet_html = parse_snippet_content('box2.html')
+        styles += snippet_css
+        html_body += f'<div class="green-box green-box-snippet">{snippet_html}</div>'
+    
+    # Obsługa pomarańczowego pola
     if data['orange'].get('htmlSnippet'):
-        snippet_css, snippet_html = parse_snippet_content(snippet_file)
-        styles += snippet_css  # Wstrzyknij CSS
+        snippet_css, snippet_html = parse_snippet_content('box1.html')
+        styles += snippet_css
         html_body += f'<div class="orange-box orange-box-snippet">{snippet_html}</div>'
 ```
 
 ## Potencjalne kierunki usprawnień
 
 ### 🎯 **Krótkoterminowe (1-2 tygodnie)**
+- ✅ **Snippet dla zielonego pola** - rozszerzenie na oba pola (UKOŃCZONE)
 - **Biblioteka snippetów** - więcej gotowych szablonów (wykresy, diagramy, listy)
-- **Snippet dla zielonego pola** - rozszerzenie na oba pola
 - **Edytor snippetów** - prosty interfejs do tworzenia bez kodowania
 - **Podgląd snippetów** - miniaturki w selektorze
 
@@ -224,7 +237,26 @@ def generate_slide_html(data, slide_dir):
 - **Snippet versioning** - historia zmian i rollback
 
 ### 🔧 **Techniczne**
+- ✅ **Screenshot stability** - poprawki CSS dla stabilnego renderowania w Selenium (UKOŃCZONE)
 - **Sandbox snippetów** - izolacja potencjalnie niebezpiecznego kodu
 - **Performance optimization** - cache parsowania dla dużych snippetów
 - **Error handling** - lepsze komunikaty błędów parsowania
 - **Unit testing** - automatyczne testy dla parsera snippetów
+
+## 🛠️ **Zmiany techniczne w tej sesji**
+
+### Frontend
+- Dodano checkbox "Dodaj HTML" dla pola zielonego
+- Implementacja funkcji `toggleGreenHtmlSnippet()` 
+- Rozszerzenie systemu presetów o `green.htmlSnippet`
+- Aktualizacja eksportu o dane zielonego snippetu
+
+### Backend
+- Obsługa `green.htmlSnippet` w CSS generation
+- Obsługa `green.htmlSnippet` w HTML generation
+- Poprawa stabilności screenshotów dla tabel snippet
+
+### Snippety
+- Utworzenie `box2.html` dla pola zielonego
+- Dodanie explicit CSS display properties dla stabilności
+- Optimalizacja dla renderowania w Selenium
