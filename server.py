@@ -374,7 +374,7 @@ class SlideScreenshotApp:
             # Green box
             if not data['green']['hidden']:
                 # Sprawdź czy używa HTML snippet
-                if data['green'].get('htmlSnippet') and data['green'].get('snippetFile'):
+                if data['green'].get('snippetFile'):
                     
                     # Załaduj i parsuj snippet
                     snippet_html = load_html_snippet(data['green']['snippetFile'])
@@ -383,7 +383,7 @@ class SlideScreenshotApp:
                         
                         # Dodaj podstawowe style dla green-box z pozycjonowaniem
                         styles += f"""
-                        .green-box {{
+                        .box2 {{
                             position: absolute;
                             left: {data['green']['x']}px;
                             top: {data['green']['y']}px;
@@ -398,7 +398,7 @@ class SlideScreenshotApp:
                     else:
                         # Fallback - zwykły green box
                         styles += f"""
-                        .green-box {{
+                        .box2 {{
                             position: absolute;
                             left: {data['green']['x']}px;
                             top: {data['green']['y']}px;
@@ -412,7 +412,7 @@ class SlideScreenshotApp:
                 else:
                     # Standardowy green box
                     styles += f"""
-                    .green-box {{
+                    .box2 {{
                         position: absolute;
                         left: {data['green']['x']}px;
                         top: {data['green']['y']}px;
@@ -425,7 +425,7 @@ class SlideScreenshotApp:
                     """
                 
                 # Green caption (tylko jeśli nie używa snippet)
-                if not data['green'].get('htmlSnippet') and data['green']['captionEnabled'] and data['green']['captionText']:
+                if not data['green'].get('snippetFile') and data['green']['captionEnabled'] and data['green']['captionText']:
                     caption_x = data['green']['x'] + data['green']['w'] // 2
                     caption_y = data['green']['y'] + data['green']['h'] + 10
                     styles += f"""
@@ -446,7 +446,7 @@ class SlideScreenshotApp:
             # Orange box  
             if not data['orange']['hidden']:
                 # Sprawdź czy używa HTML snippet
-                if data['orange'].get('htmlSnippet') and data['orange'].get('snippetFile'):
+                if data['orange'].get('snippetFile'):
                     
                     # Załaduj i parsuj snippet
                     snippet_html = load_html_snippet(data['orange']['snippetFile'])
@@ -455,7 +455,7 @@ class SlideScreenshotApp:
                         
                         # Dodaj podstawowe style dla orange-box z pozycjonowaniem
                         styles += f"""
-                        .orange-box {{
+                        .box1 {{
                             position: absolute;
                             left: {data['orange']['x']}px;
                             top: {data['orange']['y']}px;
@@ -470,7 +470,7 @@ class SlideScreenshotApp:
                     else:
                         # Fallback - zwykły orange box
                         styles += f"""
-                        .orange-box {{
+                        .box1 {{
                             position: absolute;
                             left: {data['orange']['x']}px;
                             top: {data['orange']['y']}px;
@@ -484,7 +484,7 @@ class SlideScreenshotApp:
                 else:
                     # Standardowy orange box
                     styles += f"""
-                    .orange-box {{
+                    .box1 {{
                         position: absolute;
                         left: {data['orange']['x']}px;
                         top: {data['orange']['y']}px;
@@ -497,7 +497,7 @@ class SlideScreenshotApp:
                     """
                 
                 # Orange caption (tylko jeśli nie używa snippet)
-                if not data['orange'].get('htmlSnippet') and data['orange']['captionEnabled'] and data['orange']['captionText']:
+                if not data['orange'].get('snippetFile') and data['orange']['captionEnabled'] and data['orange']['captionText']:
                     caption_x = data['orange']['x'] + data['orange']['w'] // 2
                     caption_y = data['orange']['y'] + data['orange']['h'] + 10
                     styles += f"""
@@ -567,13 +567,13 @@ class SlideScreenshotApp:
             # Dodaj elementy
             if not data['green']['hidden']:
                 # Sprawdź czy używa HTML snippet
-                if data['green'].get('htmlSnippet') and data['green'].get('snippetFile'):
+                if data['green'].get('snippetFile'):
                     # Załaduj snippet HTML
                     snippet_html = load_html_snippet(data['green']['snippetFile'])
                     if snippet_html:
                         snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
-                        # Dodaj div z klasą green-box-snippet i wewnętrznym HTML ze snippetu
-                        html_body += f'<div class="green-box green-box-snippet">{snippet_html_content}</div>'
+                        # Dodaj div z klasą box2-snippet i wewnętrznym HTML ze snippetu
+                        html_body += f'<div class="green-box box2-snippet">{snippet_html_content}</div>'
                     else:
                         # Fallback - zwykły green box
                         html_body += '<div class="green-box"></div>'
@@ -586,13 +586,13 @@ class SlideScreenshotApp:
             
             if not data['orange']['hidden']:
                 # Sprawdź czy używa HTML snippet
-                if data['orange'].get('htmlSnippet') and data['orange'].get('snippetFile'):
+                if data['orange'].get('snippetFile'):
                     # Załaduj snippet HTML
                     snippet_html = load_html_snippet(data['orange']['snippetFile'])
                     if snippet_html:
                         snippet_css, snippet_html_content = parse_snippet_content(snippet_html)
-                        # Dodaj div z klasą orange-box-snippet i wewnętrznym HTML ze snippetu
-                        html_body += f'<div class="orange-box orange-box-snippet">{snippet_html_content}</div>'
+                        # Dodaj div z klasą box1-snippet i wewnętrznym HTML ze snippetu
+                        html_body += f'<div class="orange-box box1-snippet">{snippet_html_content}</div>'
                     else:
                         # Fallback - zwykły orange box
                         html_body += '<div class="orange-box"></div>'
@@ -700,7 +700,7 @@ class SlideScreenshotApp:
                 slideWindow.style.position = 'relative';
                 
                 // Fix specjalny dla snippet tables
-                const snippetTables = slideWindow.querySelectorAll('.orange-box-snippet table, .green-box-snippet table');
+                const snippetTables = slideWindow.querySelectorAll('.box1-snippet table, .box2-snippet table');
                 snippetTables.forEach(table => {
                     table.style.display = 'table';
                     table.style.width = '100%';

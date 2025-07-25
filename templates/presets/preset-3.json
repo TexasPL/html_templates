@@ -3,9 +3,25 @@
     "description": "Preset 3",
     "green": {
         "w": 537,
-        "h": 699,
-        "x": 945,
+        "h": 537,
+        "x": 558,
         "y": 0,
+        "hidden": false,
+        "circle": true,
+        "rounded": false,
+        "lockRatio": true,
+        "captionEnabled": false,
+        "captionText": "Podpis",
+        "captionSize": 12,
+        "captionBackgroundColor": "rgb(129, 199, 132)",
+        "captionColor": "rgb(0, 0, 0)",
+        "snippetFile": "box2a.html"
+    },
+    "orange": {
+        "w": 483,
+        "h": 644,
+        "x": 143,
+        "y": 208,
         "hidden": false,
         "circle": false,
         "rounded": false,
@@ -14,24 +30,8 @@
         "captionText": "Podpis",
         "captionSize": 12,
         "captionBackgroundColor": "rgb(129, 199, 132)",
-        "captionColor": "rgb(0, 0, 0)"
-    },
-    "orange": {
-        "w": 491,
-        "h": 491,
-        "x": 118,
-        "y": 301,
-        "hidden": false,
-        "circle": false,
-        "rounded": true,
-        "lockRatio": false,
-        "captionEnabled": false,
-        "captionText": "Podpis",
-        "captionSize": 12,
-        "captionBackgroundColor": "rgb(129, 199, 132)",
         "captionColor": "rgb(0, 0, 0)",
-        "htmlSnippet": true,
-        "snippetFile": "box1.html"
+        "snippetFile": "box1b.html"
     },
     "header": {
         "x": 0,

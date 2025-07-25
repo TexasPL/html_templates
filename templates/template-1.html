@@ -9,8 +9,8 @@
 <body>
     <div class="body-wrapper">
         <div class="container">
-            <div class="image-top-right" id="greenBox"></div>
-            <div class="image-bottom-left" id="orangeBox"></div>
+            <div class="box2" id="greenBox"></div>
+            <div class="box1" id="orangeBox"></div>
             <div class="caption" id="greenCaption" contenteditable="true" style="display: none;">Podpis</div>
             <div class="caption" id="orangeCaption" contenteditable="true" style="display: none;">Podpis</div>
             <div class="text-header" id="textHeader" contenteditable="true" data-placeholder="Nagłówek">Nagłówek</div>
@@ -49,7 +49,7 @@
         
     <div class="control-panel">
         <div class="control-group green-controls">
-            <h3>Zielone pole
+            <h3>Box 2
                 <label class="visibility-control">
                     <input type="checkbox" id="greenHidden" onchange="toggleGreenVisibility()">
                     Ukryj
@@ -93,9 +93,19 @@
                     <input type="checkbox" id="greenCircle" onchange="toggleGreenCircle()">
                     Koło
                 </label>
+            </div>
+            <div class="control-row">
                 <label class="visibility-control">
-                    <input type="checkbox" id="greenHtmlSnippet" onchange="toggleGreenHtmlSnippet()">
-                    Dodaj HTML
+                    HTML:
+                    <select id="greenSnippet" onchange="selectGreenSnippet()">
+                        <option value="">Brak HTML</option>
+                        <option value="box2a.html">Tabela 2x2</option>
+                        <option value="box2b.html">Lista kropkowana</option>
+                    </select>
+                </label>
+                <label class="visibility-control" style="margin-left: auto; white-space: nowrap;">
+                    <input type="checkbox" id="greenHideBorder" onchange="toggleGreenBorder()">
+                    Usuń kontur
                 </label>
             </div>
             <div class="control-row">
@@ -114,7 +124,7 @@
         </div>
 
         <div class="control-group orange-controls">
-            <h3>Pomarańczowe pole
+            <h3>Box 1
                 <label class="visibility-control">
                     <input type="checkbox" id="orangeHidden" onchange="toggleOrangeVisibility()">
                     Ukryj
@@ -158,9 +168,19 @@
                     <input type="checkbox" id="orangeCircle" onchange="toggleOrangeCircle()">
                     Koło
                 </label>
+            </div>
+            <div class="control-row">
                 <label class="visibility-control">
-                    <input type="checkbox" id="orangeHtmlSnippet" onchange="toggleOrangeHtmlSnippet()">
-                    Dodaj HTML
+                    HTML:
+                    <select id="orangeSnippet" onchange="selectOrangeSnippet()">
+                        <option value="">Brak HTML</option>
+                        <option value="box1a.html">Tabela 2x2</option>
+                        <option value="box1b.html">Lista kropkowana</option>
+                    </select>
+                </label>
+                <label class="visibility-control" style="margin-left: auto; white-space: nowrap;">
+                    <input type="checkbox" id="orangeHideBorder" onchange="toggleOrangeBorder()">
+                    Usuń kontur
                 </label>
             </div>
             <div class="control-row">
@@ -474,7 +494,7 @@
             const actualRatio = w / h;
             const percentage = (actualRatio * 100).toFixed(1);
             const displayRatio = greenCurrentRatio || simplifyRatioFromPx(w, h);
-            greenProportion.textContent = `Zielone: ${displayRatio} (${percentage}%, ${w}x${h})`;
+            greenProportion.textContent = `Box 2: ${displayRatio} (${percentage}%, ${w}x${h})`;
             
             updateLockRatioState('green');
         }
@@ -498,7 +518,7 @@
             const actualRatio = w / h;
             const percentage = (actualRatio * 100).toFixed(1);
             const displayRatio = orangeCurrentRatio || simplifyRatioFromPx(w, h);
-            orangeProportion.textContent = `Pomarańczowe: ${displayRatio} (${percentage}%, ${w}x${h})`;
+            orangeProportion.textContent = `Box 1: ${displayRatio} (${percentage}%, ${w}x${h})`;
             
             updateLockRatioState('orange');
         }
@@ -990,8 +1010,15 @@
             } else {
                 document.getElementById('greenCaption').style.color = '#000000';
             }
-            // Zawsze ustaw htmlSnippet checkbox (domyślnie false dla starych presetów)
-            document.getElementById('greenHtmlSnippet').checked = preset.green.htmlSnippet || false;
+            // Ustaw snippet selector (obsługa starych presetów z htmlSnippet)
+            if (preset.green.snippetFile) {
+                document.getElementById('greenSnippet').value = preset.green.snippetFile;
+            } else if (preset.green.htmlSnippet) {
+                // Kompatybilność wsteczna - stare presety z htmlSnippet: true → box2a.html
+                document.getElementById('greenSnippet').value = 'box2a.html';
+            } else {
+                document.getElementById('greenSnippet').value = '';
+            }
             
             orangeWidth.value = preset.orange.w;
             orangeHeight.value = preset.orange.h;
@@ -1030,8 +1057,15 @@
             } else {
                 document.getElementById('orangeCaption').style.color = '#000000';
             }
-            // Zawsze ustaw htmlSnippet checkbox (domyślnie false dla starych presetów)
-            document.getElementById('orangeHtmlSnippet').checked = preset.orange.htmlSnippet || false;
+            // Ustaw snippet selector (obsługa starych presetów z htmlSnippet)
+            if (preset.orange.snippetFile) {
+                document.getElementById('orangeSnippet').value = preset.orange.snippetFile;
+            } else if (preset.orange.htmlSnippet) {
+                // Kompatybilność wsteczna - stare presety z htmlSnippet: true → box1a.html
+                document.getElementById('orangeSnippet').value = 'box1a.html';
+            } else {
+                document.getElementById('orangeSnippet').value = '';
+            }
             
             headerPosX.value = preset.header.x;
             headerPosY.value = preset.header.y;
@@ -1131,8 +1165,8 @@
             }
             
             // Zastosuj podgląd snippet zgodnie ze stanem checkbox (true/false)
-            toggleOrangeHtmlSnippet();
-            toggleGreenHtmlSnippet();
+            selectOrangeSnippet();
+            selectGreenSnippet();
             
         }
 
@@ -1213,8 +1247,7 @@
                     captionSize: parseInt(document.getElementById('greenCaptionSize').value),
                     captionBackgroundColor: document.getElementById('greenCaption').style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
                     captionColor: document.getElementById('greenCaption').style.color || contentElement.style.color || '#000000',
-                    htmlSnippet: document.getElementById('greenHtmlSnippet').checked,
-                    snippetFile: 'box2.html'
+                    snippetFile: document.getElementById('greenSnippet').value || null
                 },
                 orange: {
                     w: parseInt(orangeWidth.value),
@@ -1230,8 +1263,7 @@
                     captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
                     captionBackgroundColor: document.getElementById('orangeCaption').style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
                     captionColor: document.getElementById('orangeCaption').style.color || contentElement.style.color || '#000000',
-                    htmlSnippet: document.getElementById('orangeHtmlSnippet').checked,
-                    snippetFile: 'box1.html'
+                    snippetFile: document.getElementById('orangeSnippet').value || null
                 },
                 header: {
                     x: parseInt(headerPosX.value),
@@ -1744,32 +1776,51 @@ Preset JSON:
             updateOrangeCaption();
         }
 
-        function toggleOrangeHtmlSnippet() {
-            const isHtmlSnippet = document.getElementById('orangeHtmlSnippet').checked;
-            
+        function selectOrangeSnippet() {
+            const selectedSnippet = document.getElementById('orangeSnippet').value;
             const orangeBox = document.getElementById('orangeBox');
             
-            if (isHtmlSnippet) {
-                // Zastąp zawartość orange box podglądem tabeli
-                orangeBox.innerHTML = `
-                    <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <tr>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
-                        </tr>
-                    </table>
-                `;
+            if (selectedSnippet) {
+                // Wyświetl podgląd wybranego snippet'u
+                if (selectedSnippet === 'box1a.html') {
+                    // Podgląd tabeli 2x2
+                    orangeBox.innerHTML = `
+                        <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
+                            <tr>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
+                            </tr>
+                        </table>
+                    `;
+                } else if (selectedSnippet === 'box1b.html') {
+                    // Podgląd listy kropkowanej
+                    orangeBox.innerHTML = `
+                        <ul style="width: 100%; height: 100%; margin: 0; padding: 15px; list-style: none; display: flex; flex-direction: column; justify-content: space-evenly; font-family: Arial, sans-serif;">
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #e74c3c; font-size: 16px;">•</span>Pozycja 1</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #3498db; font-size: 16px;">•</span>Pozycja 2</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #2ecc71; font-size: 16px;">•</span>Pozycja 3</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #f39c12; font-size: 16px;">•</span>Pozycja 4</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #9b59b6; font-size: 16px;">•</span>Pozycja 5</li>
+                        </ul>
+                    `;
+                }
                 // Wyłącz obrazy tła dla podglądu
                 orangeBox.style.backgroundImage = 'none';
                 orangeBox.style.backgroundColor = 'transparent';
+                // Sprawdź checkbox dla kontura
+                const hideBorder = document.getElementById('orangeHideBorder').checked;
+                orangeBox.style.border = hideBorder ? 'none' : '2px solid red';
             } else {
                 // Przywróć standardowy orange box
                 orangeBox.innerHTML = '';
-                orangeBox.style.backgroundColor = '#ff9800';
+                orangeBox.style.backgroundColor = 'transparent';
+                // Sprawdź checkbox dla kontura
+                const hideBorder = document.getElementById('orangeHideBorder').checked;
+                orangeBox.style.border = hideBorder ? 'none' : '2px solid red';
                 // Przywróć obraz jeśli był
                 if (orangeImageUrl) {
                     orangeBox.style.backgroundImage = `url('${orangeImageUrl}')`;
@@ -1781,32 +1832,51 @@ Preset JSON:
             updateOrange();
         }
 
-        function toggleGreenHtmlSnippet() {
-            const isHtmlSnippet = document.getElementById('greenHtmlSnippet').checked;
-            
+        function selectGreenSnippet() {
+            const selectedSnippet = document.getElementById('greenSnippet').value;
             const greenBox = document.getElementById('greenBox');
             
-            if (isHtmlSnippet) {
-                // Zastąp zawartość green box podglądem tabeli
-                greenBox.innerHTML = `
-                    <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <tr>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
-                            <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
-                        </tr>
-                    </table>
-                `;
+            if (selectedSnippet) {
+                // Wyświetl podgląd wybranego snippet'u
+                if (selectedSnippet === 'box2a.html') {
+                    // Podgląd tabeli 2x2
+                    greenBox.innerHTML = `
+                        <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
+                            <tr>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
+                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
+                            </tr>
+                        </table>
+                    `;
+                } else if (selectedSnippet === 'box2b.html') {
+                    // Podgląd listy kropkowanej
+                    greenBox.innerHTML = `
+                        <ul style="width: 100%; height: 100%; margin: 0; padding: 15px; list-style: none; display: flex; flex-direction: column; justify-content: space-evenly; font-family: Arial, sans-serif;">
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #e74c3c; font-size: 16px;">•</span>Pozycja 1</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #3498db; font-size: 16px;">•</span>Pozycja 2</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #2ecc71; font-size: 16px;">•</span>Pozycja 3</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #f39c12; font-size: 16px;">•</span>Pozycja 4</li>
+                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #9b59b6; font-size: 16px;">•</span>Pozycja 5</li>
+                        </ul>
+                    `;
+                }
                 // Wyłącz obrazy tła dla podglądu
                 greenBox.style.backgroundImage = 'none';
                 greenBox.style.backgroundColor = 'transparent';
+                // Sprawdź checkbox dla kontura
+                const hideBorder = document.getElementById('greenHideBorder').checked;
+                greenBox.style.border = hideBorder ? 'none' : '2px solid red';
             } else {
                 // Przywróć standardowy green box
                 greenBox.innerHTML = '';
-                greenBox.style.backgroundColor = '#81c784';
+                greenBox.style.backgroundColor = 'transparent';
+                // Sprawdź checkbox dla kontura
+                const hideBorder = document.getElementById('greenHideBorder').checked;
+                greenBox.style.border = hideBorder ? 'none' : '2px solid red';
                 // Przywróć obraz jeśli był
                 if (greenImageUrl) {
                     greenBox.style.backgroundImage = `url('${greenImageUrl}')`;
@@ -1841,6 +1911,28 @@ Preset JSON:
             
             if (isVisible) {
                 updateOrangeCaption();
+            }
+        }
+
+        function toggleGreenBorder() {
+            const hideBorder = document.getElementById('greenHideBorder').checked;
+            const greenBox = document.getElementById('greenBox');
+            
+            if (hideBorder) {
+                greenBox.style.border = 'none';
+            } else {
+                greenBox.style.border = '2px solid red';
+            }
+        }
+
+        function toggleOrangeBorder() {
+            const hideBorder = document.getElementById('orangeHideBorder').checked;
+            const orangeBox = document.getElementById('orangeBox');
+            
+            if (hideBorder) {
+                orangeBox.style.border = 'none';
+            } else {
+                orangeBox.style.border = '2px solid red';
             }
         }
 
@@ -1995,8 +2087,8 @@ Preset JSON:
             const greenCaptionElement = document.getElementById('greenCaption');
             const orangeCaptionElement = document.getElementById('orangeCaption');
             
-            // Sprawdź stan orange HTML snippet
-            const orangeHtmlSnippet = document.getElementById('orangeHtmlSnippet').checked;
+            // Sprawdź wybrany snippet
+            const orangeSnippet = document.getElementById('orangeSnippet').value;
             
             const exportData = {
                 slide: {
@@ -2017,8 +2109,7 @@ Preset JSON:
                     captionSize: parseInt(document.getElementById('greenCaptionSize').value),
                     captionBackgroundColor: greenCaptionElement.style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
                     captionColor: greenCaptionElement.style.color || contentElement.style.color || '#000000',
-                    htmlSnippet: document.getElementById('greenHtmlSnippet').checked,
-                    snippetFile: 'box2.html'
+                    snippetFile: document.getElementById('greenSnippet').value || null
                 },
                 orange: {
                     w: parseInt(orangeWidth.value),
@@ -2035,8 +2126,7 @@ Preset JSON:
                     captionSize: parseInt(document.getElementById('orangeCaptionSize').value),
                     captionBackgroundColor: orangeCaptionElement.style.backgroundColor || contentElement.style.backgroundColor || '#81c784',
                     captionColor: orangeCaptionElement.style.color || contentElement.style.color || '#000000',
-                    htmlSnippet: document.getElementById('orangeHtmlSnippet').checked,
-                    snippetFile: 'box1.html'
+                    snippetFile: document.getElementById('orangeSnippet').value || null
                 },
                 header: {
                     x: parseInt(headerPosX.value),

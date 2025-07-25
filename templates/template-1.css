@@ -35,13 +35,14 @@ body {
     flex-shrink: 0;
 }
 
-.image-top-right {
+.box2 {
     position: absolute;
     top: 0px;
     left: 0px;
     width: 922px;
     height: 778px;
-    background-color: #4CAF50;
+    background-color: transparent;
+    border: 2px solid red;
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -50,13 +51,14 @@ body {
     overflow: hidden;
 }
 
-.image-bottom-left {
+.box1 {
     position: absolute;
     top: 475px;
     left: 77px;
     width: 538px;
     height: 346px;
-    background-color: #FF9800;
+    background-color: transparent;
+    border: 2px solid red;
     background-size: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -136,13 +138,6 @@ body {
     align-items: center;
 }
 
-.green-controls h3 {
-    color: #4CAF50;
-}
-
-.orange-controls h3 {
-    color: #FF9800;
-}
 
 .control-row {
     display: flex;
@@ -184,33 +179,7 @@ body {
     transition: all 0.2s;
 }
 
-.green-controls .preset-btn {
-    border-color: #4CAF50;
-    color: #4CAF50;
-}
 
-.green-controls .preset-btn:hover {
-    background: #4CAF50;
-    color: white;
-}
-
-.orange-controls .preset-btn {
-    border-color: #FF9800;
-    color: #FF9800;
-}
-
-.orange-controls .preset-btn:hover {
-    background: #FF9800;
-    color: white;
-}
-
-.green-controls input[type="range"]::-webkit-slider-thumb {
-    background: #4CAF50;
-}
-
-.orange-controls input[type="range"]::-webkit-slider-thumb {
-    background: #FF9800;
-}
 
 .proportions {
     border-top: 1px solid #ddd;
@@ -230,13 +199,6 @@ body {
     margin-bottom: 3px;
 }
 
-.green-proportion {
-    color: #4CAF50;
-}
-
-.orange-proportion {
-    color: #FF9800;
-}
 
 
 .save-btn {
