@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Playground - React Frontend</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+        }
+        .three-column-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .column {
+            box-sizing: border-box;
+        }
+        .column-left {
+            flex: 0 0 25%;
+            background-color: #cccccc;
+            padding: 20px;
+        }
+        .column-center {
+            flex: 0 0 50%;
+            background-color: #f4f4f4;
+        }
+        .column-right {
+            flex: 0 0 25%;
+            background-color: #cccccc;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1rem;}
+        textarea { height: 120px; resize: vertical; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; transition: background-color 0.2s; padding: 10px 15px; font-size: 1rem; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .main-button { width: 100%; margin-top: 10px;}
+        .response-area {
+            background-color: #e9e9e9;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 150px;
+            word-wrap: break-word;
+            font-family: sans-serif;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+        .response-area h1, .response-area h2, .response-area h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .response-area h1 { font-size: 1.5em; }
+        .response-area h2 { font-size: 1.3em; }
+        .response-area h3 { font-size: 1.1em; }
+        .response-area p { margin: 10px 0; }
+        .response-area ul, .response-area ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .response-area li { margin: 5px 0; }
+        .response-area code {
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .response-area pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .response-area pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .response-area blockquote {
+            border-left: 4px solid #ccc;
+            margin: 10px 0;
+            padding-left: 10px;
+            color: #666;
+        }
+        .response-area strong { font-weight: bold; }
+        .response-area em { font-style: italic; }
+        .response-area table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .response-area th, .response-area td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .response-area th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .model-info { font-size: 0.9em; color: #555; margin-bottom: 15px; display:flex; align-items:center; }
+        .model-status { font-size: 0.8em; margin-left: 10px; }
+        .model-status-ok { color: limegreen; }
+        .model-status-error { color: orange; }
+        .model-status-unknown { color: grey; }
+        .prompt-tiles { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .prompt-tile { background-color: #6c757d; font-size: 0.9rem; padding: 8px 12px; }
+        .prompt-tile:hover { background-color: #5a6268; }
+        .file-upload-area { border: 2px dashed #ccc; border-radius: 5px; padding: 15px; margin-bottom: 15px; }
+        .file-list { list-style: none; padding: 0; margin-top: 10px; max-height: 150px; overflow-y: auto; }
+        .file-list-item { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid #eee; font-size: 0.9em;}
+        .file-list-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 10px; max-width: 80%;}
+        .file-remove-button { font-size: 0.8rem; padding: 2px 5px; background-color: #dc3545; border-radius: 3px; line-height: 1; flex-shrink: 0; }
+        .file-remove-button:hover { background-color: #c82333; }
+        input[type="file"] { display: none; }
+        .custom-file-button { background-color: #17a2b8; padding: 8px 12px; font-size: 0.9rem; display: inline-block; margin-right: 10px; }
+        .custom-file-button:hover { background-color: #138496; }
+        .clear-files-button { background-color: #6c757d; padding: 8px 12px; font-size: 0.9rem; }
+        .clear-files-button:hover { background-color: #5a6268; }
+        .file-limit-info { font-size: 0.85em; color: #666; margin-top: 5px; }
+        .response-section { flex-grow: 1; display: flex; flex-direction: column; }
+        .response-area-wrapper { flex-grow: 1; display: flex; flex-direction: column;}
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview-item {
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 1/1;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .pdf-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: #f6f6f6;
+            color: #555;
+            font-size: 12px;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .file-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 10px;
+            padding: 3px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .conversation-controls {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .token-counter {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .token-counter-frame {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        .token-counter-title {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .token-counter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .token-counter-column {
+            text-align: center;
+            padding: 8px;
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+        .token-counter-column-title {
+            font-size: 0.75em;
+            color: #6c757d;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .token-counter-value {
+            font-size: 1.1em;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .token-counter-session {
+            grid-column: 1 / -1;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="three-column-layout">
+        <div class="column column-left"></div>
+        <div class="column column-center">
+            <div id="root"></div>
+        </div>
+        <div class="column column-right"></div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        const BACKEND_URL = window.location.origin;
+        const MAX_CONFIG_RETRIES = 5;
+        const CONFIG_RETRY_DELAY = 1000;
+
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        function App() {
+            const [modelName, setModelName] = useState('');
+            const [connectionStatus, setConnectionStatus] = useState(null);
+            const [maxFiles, setMaxFiles] = useState(5);
+            const [availableModels, setAvailableModels] = useState([]);
+            const [isModelTesting, setIsModelTesting] = useState(false);
+            const [prompt, setPrompt] = useState('');
+            const [response, setResponse] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [isConfigLoading, setIsConfigLoading] = useState(true);
+            const [isFetchingPrompt, setIsFetchingPrompt] = useState(false);
+            const [selectedFiles, setSelectedFiles] = useState([]);
+            const fileInputRef = useRef(null);
+            const [filePreviewUrls, setFilePreviewUrls] = useState([]);
+            const [rememberConversation, setRememberConversation] = useState(false);
+            
+            const generateSessionName = useCallback(() => {
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const randomLetter1 = letters.charAt(Math.floor(Math.random() * letters.length));
+                const randomLetter2 = letters.charAt(Math.floor(Math.random() * letters.length));
+                return `Sesja${randomLetter1}${randomLetter2}`;
+            }, []);
+            
+            const [sessionId, setSessionId] = useState('default');
+            const [sessionTokenCount, setSessionTokenCount] = useState(0);
+            const [inputTokens, setInputTokens] = useState(0);
+            const [outputTokens, setOutputTokens] = useState(0);
+            const [singleMessageTokens, setSingleMessageTokens] = useState(0);
+            const [sessionNameError, setSessionNameError] = useState('');
+            const [tokenStats, setTokenStats] = useState({
+                last_minute: 0,
+                last_hour: 0,
+                last_day: 0
+            });
+            const [sentFilesInSession, setSentFilesInSession] = useState(new Set());
+
+            const resetConversation = useCallback(async () => {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/reset-session`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sessionId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        setSessionTokenCount(0);
+                        setInputTokens(0);
+                        setOutputTokens(0);
+                        setSingleMessageTokens(0);
+                        setResponse('Sesja zresetowana.');
+                        setSentFilesInSession(new Set());
+                        fetchTokenStats();
+                    }
+                } catch (error) {
+                    setResponse(`Błąd resetowania sesji: ${error.message}`);
+                }
+            }, [sessionId]);
+
+            useEffect(() => {
+                if (!rememberConversation) {
+                    setSessionTokenCount(0);
+                    setInputTokens(0);
+                    setOutputTokens(0);
+                    setSingleMessageTokens(0);
+                    setSentFilesInSession(new Set());
+                } else {
+                    // Gdy włączamy tryb sesji, wygeneruj nową nazwę tylko jeśli to default
+                    if (sessionId === 'default') {
+                        setSessionId(generateSessionName());
+                    }
+                }
+            }, [rememberConversation, sessionId, generateSessionName]);
+
+            const fetchTokenStats = useCallback(async () => {
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/token-stats`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setTokenStats(data);
+                    }
+                } catch (error) {
+                    console.error('Błąd pobierania statystyk tokenów:', error);
+                }
+            }, []);
+
+            const renderMarkdown = (text) => {
+                if (!text) return '';
+                
+                // Sprawdź czy marked jest dostępny
+                if (typeof marked === 'undefined') {
+                    console.error('Biblioteka marked nie jest załadowana - używam podstawowego parsowania');
+                    return basicMarkdownParse(text);
+                }
+                
+                try {
+                    // Konfiguracja marked
+                    marked.setOptions({
+                        breaks: true,
+                        gfm: true,
+                        sanitize: false,
+                        headerIds: false,
+                        mangle: false
+                    });
+                    
+                    const html = marked.parse(text);
+                    console.log('Markdown input:', text);
+                    console.log('HTML output:', html);
+                    return html;
+                } catch (error) {
+                    console.error('Błąd parsowania Markdown:', error);
+                    return basicMarkdownParse(text);
+                }
+            };
+
+            const basicMarkdownParse = (text) => {
+                let html = text;
+                
+                // Bold (najpierw ** potem *)
+                html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+                
+                // Headers
+                html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+                html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+                html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+                
+                // Code blocks
+                html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+                
+                // Lists - grupuj ciągłe elementy listy
+                const lines = html.split('\n');
+                const processedLines = [];
+                let inList = false;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
+                    const isListItem = line.match(/^\* (.+)$/);
+                    
+                    if (isListItem) {
+                        if (!inList) {
+                            processedLines.push('<ul>');
+                            inList = true;
+                        }
+                        processedLines.push(`<li>${isListItem[1]}</li>`);
+                    } else {
+                        if (inList) {
+                            processedLines.push('</ul>');
+                            inList = false;
+                        }
+                        processedLines.push(line);
+                    }
+                }
+                
+                // Zamknij listę na końcu jeśli trzeba
+                if (inList) {
+                    processedLines.push('</ul>');
+                }
+                
+                // Połącz linie z powrotem
+                html = processedLines.join('\n');
+                
+                // Paragraphs i line breaks
+                html = html.replace(/\n\n/g, '</p><p>');
+                html = html.replace(/\n/g, '<br>');
+                html = `<p>${html}</p>`;
+                
+                // Wyczyść puste paragrafy
+                html = html.replace(/<p><\/p>/g, '');
+                html = html.replace(/<p><br><\/p>/g, '');
+                
+                return html;
+            };
+
+            const fetchConfig = useCallback(async () => {
+                setIsConfigLoading(true);
+                let retries = 0;
+                while (retries < MAX_CONFIG_RETRIES) {
+                    try {
+                        const res = await fetch(`${BACKEND_URL}/api/config`);
+                        if (!res.ok) throw new Error(`Błąd serwera: ${res.status}`);
+                        const data = await res.json();
+                        setModelName(data.model || 'N/A');
+                        setConnectionStatus(data.connection_status);
+                        setMaxFiles(data.max_files || 5);
+                        setIsConfigLoading(false);
+                        return;
+                    } catch (error) {
+                        retries++;
+                        if (retries < MAX_CONFIG_RETRIES) {
+                            await delay(CONFIG_RETRY_DELAY);
+                        }
+                    }
+                }
+                setModelName('Błąd ładowania');
+                setConnectionStatus(null);
+                setIsConfigLoading(false);
+            }, []);
+            
+            const fetchModels = useCallback(async () => {
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/models`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setAvailableModels(data.models || []);
+                    }
+                } catch (error) {
+                    console.error('Błąd pobierania modeli:', error);
+                }
+            }, []);
+            
+            const handleModelChange = useCallback(async (newModel) => {
+                if (newModel === modelName) return;
+                
+                setIsModelTesting(true);
+                setConnectionStatus(null);
+                
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/change-model`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({model: newModel})
+                    });
+                    
+                    const data = await res.json();
+                    if (data.success) {
+                        setModelName(newModel);
+                        // Czekaj na wynik testu API
+                        await waitForModelTest(newModel);
+                    } else {
+                        setResponse(`Błąd zmiany modelu: ${data.message}`);
+                    }
+                } catch (error) {
+                    setResponse(`Błąd zmiany modelu: ${error.message}`);
+                } finally {
+                    setIsModelTesting(false);
+                }
+            }, [modelName]);
+            
+            const waitForModelTest = useCallback(async (model) => {
+                // Czekaj maksymalnie 10 sekund na wynik testu
+                let attempts = 0;
+                const maxAttempts = 20;
+                
+                while (attempts < maxAttempts) {
+                    try {
+                        const res = await fetch(`${BACKEND_URL}/api/config`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.connection_status !== null) {
+                                setConnectionStatus(data.connection_status);
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Błąd sprawdzania statusu:', error);
+                    }
+                    
+                    await delay(500);
+                    attempts++;
+                }
+                
+                // Timeout - ustaw status na nieznany
+                setConnectionStatus(null);
+            }, []);
+
+            useEffect(() => {
+                fetchConfig();
+                fetchModels();
+                fetchTokenStats();
+                
+                // Automatyczne odświeżanie statystyk co minutę
+                const intervalId = setInterval(fetchTokenStats, 60000);
+                
+                // Test formatowania markdown
+                const testMarkdown = "Dokument zawiera szczegóły dotyczące dwóch miejsc: * **Opcja 1:** Hotel Ilonn * **Opcja 2:** Test";
+                console.log('Test markdown:', renderMarkdown(testMarkdown));
+                
+                return () => clearInterval(intervalId);
+            }, [fetchConfig, fetchModels, fetchTokenStats]);
+
+            useEffect(() => {
+                const urls = selectedFiles.map(file => {
+                    if (file.type.startsWith('image/')) {
+                        return { url: URL.createObjectURL(file), type: 'image', name: file.name };
+                    } else if (file.type === 'application/pdf') {
+                        return { url: null, type: 'pdf', name: file.name };
+                    }
+                    return { url: null, type: 'other', name: file.name };
+                });
+                
+                setFilePreviewUrls(urls);
+                
+                return () => {
+                    urls.forEach(item => {
+                        if (item.url) URL.revokeObjectURL(item.url);
+                    });
+                };
+            }, [selectedFiles]);
+
+            const handleFileChange = (event) => {
+                const newFiles = Array.from(event.target.files);
+                if (!newFiles.length) return;
+
+                const totalFiles = selectedFiles.length + newFiles.length;
+
+                if (totalFiles > maxFiles) {
+                    const slots = maxFiles - selectedFiles.length;
+                    if (slots > 0) {
+                        const filesToAdd = newFiles.slice(0, slots);
+                        setSelectedFiles(prevFiles => [...prevFiles, ...filesToAdd]);
+                    }
+                } else {
+                    setSelectedFiles(prevFiles => [...prevFiles, ...newFiles]);
+                }
+
+                if(fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            };
+
+            const removeFile = (indexToRemove) => {
+                setSelectedFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
+            };
+
+            const clearAllFiles = () => {
+                setSelectedFiles([]);
+                if(fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            };
+
+            const fetchPredefinedPrompt = async (promptId) => {
+                if (isLoading || isFetchingPrompt) return;
+                setIsFetchingPrompt(true);
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/prompt/${promptId}`);
+                    const data = await res.json();
+                    if (!res.ok || !data.success) {
+                        throw new Error(data.message || `Błąd ${res.status}`);
+                    }
+                    setPrompt(data.prompt_text);
+                } catch (error) {
+                    setResponse(`Błąd wczytywania promptu: ${error.message}`);
+                } finally {
+                    setIsFetchingPrompt(false);
+                }
+            };
+
+            const checkSessionAvailability = async (sessionName) => {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/check-session-availability`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sessionId: sessionName })
+                    });
+                    const data = await response.json();
+                    return data.available;
+                } catch (error) {
+                    return false;
+                }
+            };
+
+            const handleSendPrompt = async () => {
+                if ((!prompt.trim() && selectedFiles.length === 0) || selectedFiles.length > maxFiles) {
+                    return;
+                }
+
+                // Sprawdź dostępność nazwy sesji tylko jeśli sesja nie jest już aktywna
+                if (rememberConversation && sessionId && sessionTokenCount === 0) {
+                    const isAvailable = await checkSessionAvailability(sessionId);
+                    if (!isAvailable) {
+                        setSessionNameError('Nazwa sesji już istnieje dla dzisiejszego dnia');
+                        return;
+                    }
+                }
+
+                setIsLoading(true);
+                setResponse('');
+                setSessionNameError('');
+
+                // Przygotuj prompt z informacją o nowo załączonych plikach
+                let finalPrompt = prompt;
+                if (selectedFiles.length > 0) {
+                    // W trybie sesji - dodaj tylko nowe pliki
+                    if (rememberConversation) {
+                        const newFiles = selectedFiles.filter(file => !sentFilesInSession.has(file.name));
+                        if (newFiles.length > 0) {
+                            const newFileNames = newFiles.map(file => file.name);
+                            const newFileList = newFileNames.join(', ');
+                            finalPrompt = `${prompt}\n\nZałączone do wiadomości pliki: ${newFileList}.`;
+                        }
+                    } else {
+                        // W trybie jednorazowym - dodaj wszystkie pliki
+                        const fileNames = selectedFiles.map(file => file.name);
+                        const fileList = fileNames.join(', ');
+                        finalPrompt = `${prompt}\n\nZałączone do wiadomości pliki: ${fileList}.`;
+                    }
+                }
+
+                const formData = new FormData();
+                formData.append('prompt', finalPrompt);
+                formData.append('rememberConversation', rememberConversation);
+                if (rememberConversation) {
+                    formData.append('sessionId', sessionId);
+                }
+                
+                selectedFiles.forEach((file) => {
+                    formData.append('files', file, file.name);
+                });
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/generate`, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        throw new Error(data.message || `Błąd serwera: ${res.status}`);
+                    }
+
+                    const responseMessage = data.message || 'Otrzymano pustą odpowiedź od serwera.';
+                    setResponse(responseMessage);
+
+                    if (rememberConversation && data.sessionTokenCount !== undefined) {
+                        setSessionTokenCount(data.sessionTokenCount);
+                    } else if (!rememberConversation) {
+                        // Tryb pojedynczej wiadomości
+                        if (data.singleMessageTokens !== undefined) {
+                            setSingleMessageTokens(data.singleMessageTokens);
+                        }
+                        if (data.inputTokens !== undefined) {
+                            setInputTokens(data.inputTokens);
+                        }
+                        if (data.outputTokens !== undefined) {
+                            setOutputTokens(data.outputTokens);
+                        }
+                    }
+
+                    // Zaktualizuj listę wysłanych plików w sesji
+                    if (rememberConversation && selectedFiles.length > 0) {
+                        setSentFilesInSession(prev => {
+                            const newSet = new Set(prev);
+                            selectedFiles.forEach(file => newSet.add(file.name));
+                            return newSet;
+                        });
+                    }
+
+                    // Odśwież statystyki tokenów po każdym zapytaniu
+                    fetchTokenStats();
+
+                } catch (error) {
+                    setResponse(`Błąd: ${error.message}`);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            
+            const getModelStatusClass = (status) => {
+                if (status === true) return 'model-status-ok';
+                if (status === false) return 'model-status-error';
+                return 'model-status-unknown';
+            }
+
+            const getModelStatusText = (status) => {
+                if (status === true) return '(API OK)';
+                if (status === false) return '(API Błąd/Niedostępny)';
+                return '(Status Nieznany)';
+            }
+
+            const canSelectMoreFiles = selectedFiles.length < maxFiles;
+            const isUiLoading = isLoading || isConfigLoading || isModelTesting;
+            const canUsePrompts = connectionStatus === true && !isUiLoading;
+
+            return (
+                <div className="container">
+                    <h1>AI Playground</h1>
+
+                    <div className="model-info">
+                        <span>Model: 
+                            {isConfigLoading ? (
+                                <strong>Ładowanie...</strong>
+                            ) : (
+                                <select 
+                                    value={modelName} 
+                                    onChange={(e) => handleModelChange(e.target.value)}
+                                    disabled={isUiLoading}
+                                    style={{
+                                        marginLeft: '8px',
+                                        padding: '4px 8px',
+                                        fontSize: '0.9em',
+                                        border: '1px solid #ccc',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'white',
+                                        cursor: isUiLoading ? 'not-allowed' : 'pointer'
+                                    }}
+                                >
+                                    {availableModels.map((model) => (
+                                        <option key={model.name} value={model.name}>
+                                            {model.name} - {model.description}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
+                        </span>
+                         {!isConfigLoading && modelName && modelName !== 'Błąd ładowania' && (
+                            <span className={`model-status ${getModelStatusClass(connectionStatus)}`}>
+                                {isModelTesting ? '(Testowanie...)' : getModelStatusText(connectionStatus)}
+                             </span>
+                         )}
+                    </div>
+
+                    <div className="file-upload-area">
+                         <input
+                            type="file"
+                            id="fileUpload"
+                            accept="image/*,application/pdf"
+                            multiple
+                            onChange={handleFileChange}
+                            ref={fileInputRef}
+                            disabled={isUiLoading || !canSelectMoreFiles}
+                        />
+                         <button
+                            className="custom-file-button"
+                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                            disabled={isUiLoading || !canSelectMoreFiles}
+                        >
+                            Wybierz pliki
+                        </button>
+                         {selectedFiles.length > 0 && (
+                              <button className="clear-files-button" onClick={clearAllFiles} disabled={isUiLoading}>
+                                Wyczyść pliki ({selectedFiles.length})
+                            </button>
+                         )}
+                         <p className="file-limit-info">
+                            Możesz dodać do {maxFiles} plików (obrazy lub PDF).
+                            {!canSelectMoreFiles && <span style={{color: 'red', fontWeight:'bold'}}> Osiągnięto limit plików.</span>}
+                        </p>
+                        
+                        {filePreviewUrls.length > 0 && (
+                            <div className="image-preview-grid">
+                                {filePreviewUrls.map((file, index) => (
+                                    <div className="image-preview-item" key={index}>
+                                        {file.type === 'image' ? (
+                                            <img src={file.url} alt={file.name} className="image-preview" />
+                                        ) : (
+                                            <div className="pdf-preview">{file.type.toUpperCase()}</div>
+                                        )}
+                                        <div className="file-info-overlay">{file.name}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="conversation-controls">
+                        <div className="checkbox-container">
+                            <input
+                                type="checkbox"
+                                id="rememberConversation"
+                                checked={rememberConversation}
+                                onChange={(e) => setRememberConversation(e.target.checked)}
+                                disabled={isUiLoading}
+                            />
+                            <label htmlFor="rememberConversation">Pamiętaj konwersację (sesja)</label>
+                        </div>
+                        {rememberConversation && (
+                            <>
+                                <div className="session-controls" style={{marginTop: '10px'}}>
+                                    <label htmlFor="sessionId" style={{fontSize: '0.9em'}}>ID sesji:</label>
+                                    <input
+                                        type="text"
+                                        id="sessionId"
+                                        value={sessionId}
+                                        onChange={(e) => {
+                                            setSessionId(e.target.value);
+                                            setSessionNameError('');
+                                        }}
+                                        disabled={isUiLoading}
+                                        style={{marginLeft: '8px', padding: '4px', fontSize: '0.9em', width: '100px'}}
+                                    />
+                                    <button
+                                        onClick={resetConversation}
+                                        disabled={isUiLoading}
+                                        style={{marginLeft: '8px', padding: '4px 8px', fontSize: '0.8em', backgroundColor: '#dc3545'}}
+                                    >
+                                        Reset sesji
+                                    </button>
+                                </div>
+                                {sessionNameError && (
+                                    <div style={{color: 'red', fontSize: '0.8em', marginTop: '5px'}}>
+                                        {sessionNameError}
+                                    </div>
+                                )}
+                                <div className="token-counter">
+                                    Tokeny w sesji: {sessionTokenCount}
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                     <div className="prompt-tiles">
+                        <button className="prompt-tile" onClick={() => fetchPredefinedPrompt(1)} disabled={!canUsePrompts || isFetchingPrompt}>Prompt</button>
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="prompt-input">Prompt:</label>
+                        <textarea
+                            id="prompt-input"
+                            value={prompt}
+                            onChange={(e) => setPrompt(e.target.value)}
+                            disabled={!canUsePrompts}
+                            placeholder={selectedFiles.length > 0 ? "Wpisz zapytanie dotyczące załączonych plików..." : "Wpisz swoje zapytanie tutaj lub użyj predefiniowanego promptu..."}
+                        />
+                    </div>
+
+                    <button className="main-button" onClick={handleSendPrompt} disabled={!canUsePrompts || (!prompt.trim() && selectedFiles.length === 0) || isFetchingPrompt}>
+                        {isLoading ? 'Przetwarzanie...' : (isModelTesting ? 'Testowanie API...' : 'Wyślij')}
+                    </button>
+
+                    <div className="response-section">
+                        <label style={{marginTop: '20px'}}>Odpowiedź:</label>
+                         <div className="response-area-wrapper">
+                            <div className="response-area">
+                                {isLoading 
+                                    ? 'Oczekiwanie na odpowiedź...' 
+                                    : (isConfigLoading 
+                                        ? 'Ładowanie konfiguracji...' 
+                                        : (response ? (
+                                            <div dangerouslySetInnerHTML={{ __html: renderMarkdown(response) }} />
+                                        ) : 'Tutaj pojawi się odpowiedź modelu.'))
+                                }
+                            </div>
+                         </div>
+                    </div>
+                    
+                    <div className="token-counter-frame">
+                        <div className="token-counter-title">Wykorzystane tokeny</div>
+                        
+                        {/* Sesja - jeśli aktywna */}
+                        {rememberConversation && (
+                            <div className="token-counter-session">
+                                <div className="token-counter-column">
+                                    <div className="token-counter-column-title">Sesja</div>
+                                    <div className="token-counter-value">{sessionTokenCount}</div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Bieżące zapytanie - jeśli tryb jednorazowy */}
+                        {!rememberConversation && (
+                            <div className="token-counter-session">
+                                <div className="token-counter-grid">
+                                    <div className="token-counter-column">
+                                        <div className="token-counter-column-title">Wejściowe</div>
+                                        <div className="token-counter-value">{inputTokens || 0}</div>
+                                    </div>
+                                    <div className="token-counter-column">
+                                        <div className="token-counter-column-title">Wyjściowe</div>
+                                        <div className="token-counter-value">{outputTokens || 0}</div>
+                                    </div>
+                                    <div className="token-counter-column">
+                                        <div className="token-counter-column-title">Łącznie</div>
+                                        <div className="token-counter-value">{singleMessageTokens || 0}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Statystyki czasowe */}
+                        <div className="token-counter-grid">
+                            <div className="token-counter-column">
+                                <div className="token-counter-column-title">Ostatnia minuta</div>
+                                <div className="token-counter-value">{tokenStats.last_minute}</div>
+                            </div>
+                            <div className="token-counter-column">
+                                <div className="token-counter-column-title">Ostatnia godzina</div>
+                                <div className="token-counter-value">{tokenStats.last_hour}</div>
+                            </div>
+                            <div className="token-counter-column">
+                                <div className="token-counter-column-title">Ostatnia doba</div>
+                                <div className="token-counter-value">{tokenStats.last_day}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>

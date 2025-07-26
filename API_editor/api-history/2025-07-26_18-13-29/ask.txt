@@ -1,0 +1,2 @@
+--- PROMPT ---
+Podaj stolicę Polski, odp. jednym słowem.

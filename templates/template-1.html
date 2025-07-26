@@ -1781,33 +1781,18 @@ Preset JSON:
             const orangeBox = document.getElementById('orangeBox');
             
             if (selectedSnippet) {
-                // Wyświetl podgląd wybranego snippet'u
-                if (selectedSnippet === 'box1a.html') {
-                    // Podgląd tabeli 2x2
-                    orangeBox.innerHTML = `
-                        <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
-                            <tr>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
-                            </tr>
-                        </table>
-                    `;
-                } else if (selectedSnippet === 'box1b.html') {
-                    // Podgląd listy kropkowanej
-                    orangeBox.innerHTML = `
-                        <ul style="width: 100%; height: 100%; margin: 0; padding: 15px; list-style: none; display: flex; flex-direction: column; justify-content: space-evenly; font-family: Arial, sans-serif;">
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #e74c3c; font-size: 16px;">•</span>Pozycja 1</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #3498db; font-size: 16px;">•</span>Pozycja 2</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #2ecc71; font-size: 16px;">•</span>Pozycja 3</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #f39c12; font-size: 16px;">•</span>Pozycja 4</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #9b59b6; font-size: 16px;">•</span>Pozycja 5</li>
-                        </ul>
-                    `;
-                }
+                // Ładuj rzeczywisty plik snippet
+                fetch(`/api/snippet/${selectedSnippet}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            orangeBox.innerHTML = data.content;
+                            orangeBox.classList.add('box1-snippet');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Błąd ładowania snippet:', error);
+                    });
                 // Wyłącz obrazy tła dla podglądu
                 orangeBox.style.backgroundImage = 'none';
                 orangeBox.style.backgroundColor = 'transparent';
@@ -1817,6 +1802,7 @@ Preset JSON:
             } else {
                 // Przywróć standardowy orange box
                 orangeBox.innerHTML = '';
+                orangeBox.classList.remove('box1-snippet');
                 orangeBox.style.backgroundColor = 'transparent';
                 // Sprawdź checkbox dla kontura
                 const hideBorder = document.getElementById('orangeHideBorder').checked;
@@ -1837,33 +1823,18 @@ Preset JSON:
             const greenBox = document.getElementById('greenBox');
             
             if (selectedSnippet) {
-                // Wyświetl podgląd wybranego snippet'u
-                if (selectedSnippet === 'box2a.html') {
-                    // Podgląd tabeli 2x2
-                    greenBox.innerHTML = `
-                        <table style="width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed;">
-                            <tr>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #e74c3c; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A1</td>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #3498db; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">A2</td>
-                            </tr>
-                            <tr>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #2ecc71; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B1</td>
-                                <td style="width: 50%; height: 50%; border: 1px solid #333; background-color: #f39c12; text-align: center; vertical-align: middle; color: white; font-weight: bold; font-size: 12px;">B2</td>
-                            </tr>
-                        </table>
-                    `;
-                } else if (selectedSnippet === 'box2b.html') {
-                    // Podgląd listy kropkowanej
-                    greenBox.innerHTML = `
-                        <ul style="width: 100%; height: 100%; margin: 0; padding: 15px; list-style: none; display: flex; flex-direction: column; justify-content: space-evenly; font-family: Arial, sans-serif;">
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #e74c3c; font-size: 16px;">•</span>Pozycja 1</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #3498db; font-size: 16px;">•</span>Pozycja 2</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #2ecc71; font-size: 16px;">•</span>Pozycja 3</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #f39c12; font-size: 16px;">•</span>Pozycja 4</li>
-                            <li style="position: relative; padding-left: 20px; font-size: 12px; font-weight: bold; color: #333;"><span style="position: absolute; left: 0; color: #9b59b6; font-size: 16px;">•</span>Pozycja 5</li>
-                        </ul>
-                    `;
-                }
+                // Ładuj rzeczywisty plik snippet
+                fetch(`/api/snippet/${selectedSnippet}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            greenBox.innerHTML = data.content;
+                            greenBox.classList.add('box2-snippet');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Błąd ładowania snippet:', error);
+                    });
                 // Wyłącz obrazy tła dla podglądu
                 greenBox.style.backgroundImage = 'none';
                 greenBox.style.backgroundColor = 'transparent';
@@ -1873,6 +1844,7 @@ Preset JSON:
             } else {
                 // Przywróć standardowy green box
                 greenBox.innerHTML = '';
+                greenBox.classList.remove('box2-snippet');
                 greenBox.style.backgroundColor = 'transparent';
                 // Sprawdź checkbox dla kontura
                 const hideBorder = document.getElementById('greenHideBorder').checked;
@@ -2180,6 +2152,141 @@ Preset JSON:
                 alert('Błąd połączenia z serwerem');
             });
         }
+        
+        // AI Panel functions
+        function loadPrompt1() {
+            fetch('/api/prompt/1', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('aiPrompt').value = data.prompt_text;
+                } else {
+                    alert('Błąd ładowania promptu: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Błąd połączenia z serwerem');
+            });
+        }
+        
+        function toggleAiSession() {
+            const checkbox = document.getElementById('aiRememberConversation');
+            const sessionId = document.getElementById('aiSessionId');
+            const resetBtn = document.getElementById('aiResetSession');
+            
+            if (checkbox.checked) {
+                sessionId.style.display = 'inline';
+                resetBtn.style.display = 'inline';
+                if (!sessionId.value) {
+                    sessionId.value = generateSessionName();
+                }
+            } else {
+                sessionId.style.display = 'none';
+                resetBtn.style.display = 'none';
+            }
+        }
+        
+        function generateSessionName() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const randomLetter1 = letters.charAt(Math.floor(Math.random() * letters.length));
+            const randomLetter2 = letters.charAt(Math.floor(Math.random() * letters.length));
+            return `SesjaAI${randomLetter1}${randomLetter2}`;
+        }
+        
+        function resetAiSession() {
+            const sessionId = document.getElementById('aiSessionId').value;
+            if (!sessionId) return;
+            
+            fetch('/api/reset-ai-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sessionId: sessionId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sesja AI zresetowana');
+                } else {
+                    alert('Błąd resetowania sesji: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Błąd połączenia z serwerem');
+            });
+        }
+
+        function editSnippet() {
+            const prompt = document.getElementById('aiPrompt').value;
+            if (!prompt.trim()) {
+                alert('Wpisz instrukcję edycji');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('aiSubmit');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Przetwarzanie...';
+            
+            // Przygotuj dane sesji
+            const rememberConversation = document.getElementById('aiRememberConversation').checked;
+            const sessionId = rememberConversation ? document.getElementById('aiSessionId').value : null;
+            
+            const requestData = { 
+                prompt: prompt,
+                rememberConversation: rememberConversation,
+                sessionId: sessionId
+            };
+            
+            fetch('/api/edit-snippet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Snippet zaktualizowany!');
+                    // Odśwież tylko snippet w orange box jeśli wybrany
+                    const selectedSnippet = document.getElementById('orangeSnippet').value;
+                    if (selectedSnippet === 'box1a.html') {
+                        selectOrangeSnippet(); // Przeładuj snippet bez reload strony
+                    }
+                } else {
+                    alert('Błąd: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Błąd połączenia z serwerem');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Edytuj box1a.html';
+            });
+        }
     </script>
+
+    <!-- AI Panel -->
+    <div class="ai-panel">
+        <h3>AI Edytor Snippetów</h3>
+        <div class="ai-controls">
+            <div class="ai-session-controls">
+                <label>
+                    <input type="checkbox" id="aiRememberConversation" onchange="toggleAiSession()">
+                    Pamiętaj konwersację (sesja)
+                </label>
+                <input type="text" id="aiSessionId" placeholder="ID sesji" style="display:none; width: 100px; padding: 4px; margin: 0 8px; font-size: 11px;">
+                <button id="aiResetSession" onclick="resetAiSession()" style="display:none; padding: 4px 8px; font-size: 11px; background: #dc3545; color: white; border: none; border-radius: 3px;">Reset</button>
+            </div>
+            <button class="prompt-btn" onclick="loadPrompt1()">Prompt HTML</button>
+            <textarea id="aiPrompt" placeholder="Wpisz instrukcję edycji box1a.html..."></textarea>
+            <button id="aiSubmit" class="ai-submit-btn" onclick="editSnippet()">Edytuj box1a.html</button>
+        </div>
+    </div>
+
 </body>
 </html>

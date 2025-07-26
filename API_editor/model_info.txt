@@ -1,0 +1,64 @@
+GEMINI MODEL INFORMATION (na 8. lipca 2025)
+========================
+
+## Main Models
+gemini-2.0-flash - Najnowszy multimodalny model, obsługuje tekst, obraz, audio, wideo
+gemini-1.5-flash - Szybki model ogólnego przeznaczenia
+gemini-1.5-pro - Większy model z lepszymi możliwościami rozumowania
+gemini-2.5-flash - Model z funkcjami thinking (rozumowanie przed odpowiedzią)
+gemini-2.5-pro - Zaawansowany model z funkcjami thinking
+
+## Preview Models
+gemini-2.5-flash-preview-04-17 - Podgląd Flash z 17 kwietnia
+gemini-2.5-flash-preview-05-20 - Podgląd Flash z 20 maja
+gemini-2.5-pro-preview-03-25 - Podgląd Pro z 25 marca
+gemini-2.5-pro-preview-05-06 - Podgląd Pro z 6 maja
+gemini-2.5-pro-preview-06-05 - Podgląd Pro z 5 czerwca
+
+## Stable Versions
+gemini-1.5-flash-001 - Pierwsza wersja stabilna 1.5 Flash
+gemini-1.5-flash-002 - Druga wersja stabilna 1.5 Flash
+gemini-1.5-flash-8b - Mniejsza wersja 1.5 Flash (8B parametrów)
+gemini-1.5-flash-8b-001 - Pierwsza wersja stabilna 8B
+gemini-1.5-pro-001 - Pierwsza wersja stabilna 1.5 Pro
+gemini-1.5-pro-002 - Druga wersja stabilna 1.5 Pro
+gemini-2.0-flash-001 - Pierwsza wersja stabilna 2.0 Flash
+
+## Latest Aliases
+gemini-1.5-flash-latest - Wskazuje na najnowszą wersję 1.5 Flash
+gemini-1.5-flash-8b-latest - Wskazuje na najnowszą wersję 8B
+gemini-1.5-pro-latest - Wskazuje na najnowszą wersję 1.5 Pro
+
+## Experimental Models
+gemini-1.5-flash-8b-exp-0827 - Eksperymentalna wersja 8B z 27 sierpnia
+gemini-1.5-flash-8b-exp-0924 - Eksperymentalna wersja 8B z 24 września
+gemini-1.5-pro-exp-0801 - Eksperymentalna wersja Pro z 1 sierpnia
+gemini-1.5-pro-exp-0827 - Eksperymentalna wersja Pro z 27 sierpnia
+gemini-2.0-flash-exp - Eksperymentalna wersja 2.0 Flash
+gemini-2.0-pro-exp-02-05 - Eksperymentalna wersja 2.0 Pro z 5 lutego
+
+## Specialized Models
+gemini-2.0-flash-exp-image-generation - Wersja z generowaniem obrazów
+gemini-2.0-flash-preview-image-generation - Podgląd generowania obrazów
+gemini-2.0-flash-lite - Lekka wersja 2.0 Flash
+gemini-2.0-flash-lite-001 - Pierwsza wersja stabilna Lite
+gemini-2.0-flash-live-001 - Wersja do interakcji na żywo (Live API)
+gemini-2.5-flash-lite - Lekka wersja 2.5 Flash
+gemini-2.5-flash-lite-preview-06-17 - Podgląd Lite z 17 czerwca
+
+## Thinking Models
+gemini-2.0-flash-thinking-exp-01-21 - Eksperymentalna wersja thinking z 21 stycznia
+gemini-2.0-flash-thinking-exp-1219 - Eksperymentalna wersja thinking z 19 grudnia
+
+## Audio/TTS Models
+gemini-2.5-flash-native-audio - Wersja z natywnym wsparciem audio
+gemini-2.5-flash-exp-native-audio-thinking-dialog - Eksperymentalna wersja z audio i dialogiem
+gemini-2.5-flash-preview-native-audio-dialog - Podgląd native audio z dialogiem
+gemini-2.5-flash-preview-tts - Podgląd z funkcjami text-to-speech
+gemini-2.5-pro-preview-tts - Podgląd Pro z TTS
+
+## Legacy/Experimental
+gemini-exp-1114 - Eksperymentalna wersja z 14 listopada
+gemini-exp-1121 - Eksperymentalna wersja z 21 listopada
+gemini-exp-1206 - Eksperymentalna wersja z 6 grudnia
+gemini-nano - Najmniejszy model do urządzeń mobilnych

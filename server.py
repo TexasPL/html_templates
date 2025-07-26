@@ -9,6 +9,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import time
+import json
+from pathlib import Path
+from google import genai
 
 class SlideScreenshotApp:
     def __init__(self):
@@ -21,8 +24,67 @@ class SlideScreenshotApp:
         self.server_running = False
         self.flask_app = None
         self.driver = None  # Persistent Chrome instance
+        
+        # Gemini API setup
+        self.gemini_client = None
+        self.ai_sessions = {}  # Przechowuje sesje AI
+        self.init_gemini_api()
+        
         self.setup_gui()
         self.setup_flask()
+    
+    def init_gemini_api(self):
+        try:
+            config_file = Path('API_editor/config.json')
+            if config_file.exists():
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    api_key = config.get('api_key_gemini')
+                    if api_key:
+                        self.gemini_client = genai.Client(api_key=api_key)
+                        print("Gemini API zainicjalizowany")
+                    else:
+                        print("Brak klucza API Gemini w config.json")
+            else:
+                print("Plik config.json nie istnieje")
+        except Exception as e:
+            print(f"Błąd inicjalizacji Gemini API: {e}")
+    
+    def generate_with_gemini(self, prompt, session_id=None, remember_conversation=False):
+        if not self.gemini_client:
+            return None
+        try:
+            if remember_conversation and session_id:
+                # Użyj istniejącej sesji lub utwórz nową
+                if session_id not in self.ai_sessions:
+                    self.ai_sessions[session_id] = self.gemini_client.chats.create(model="gemini-1.5-flash-latest")
+                    print(f"Utworzono nową sesję AI: {session_id}")
+                session = self.ai_sessions[session_id]
+            else:
+                # Sesja jednorazowa
+                session = self.gemini_client.chats.create(model="gemini-1.5-flash-latest")
+            
+            response = session.send_message(prompt)
+            result = response.text
+            
+            # Usuń markdown code blocks jeśli istnieją
+            if result.startswith('```html'):
+                result = result.replace('```html', '', 1)
+            if result.endswith('```'):
+                result = result.rsplit('```', 1)[0]
+            result = result.strip()
+            
+            return result
+        except Exception as e:
+            print(f"Błąd generowania z Gemini: {e}")
+            return None
+    
+    def reset_ai_session(self, session_id):
+        if session_id in self.ai_sessions:
+            del self.ai_sessions[session_id]
+            print(f"Zresetowano sesję AI: {session_id}")
+            return True
+        return False
         
     def setup_gui(self):
         # Główna ramka
@@ -247,6 +309,107 @@ class SlideScreenshotApp:
                 print(f"Błąd pobierania dostępnych presetów: {str(e)}")
                 return jsonify({'presets': []})
         
+        @self.flask_app.route('/api/snippet/<path:filename>', methods=['GET'])
+        def get_snippet(filename):
+            try:
+                import os
+                snippet_path = os.path.join('templates/presets', filename)
+                
+                if not os.path.exists(snippet_path):
+                    return jsonify({'success': False, 'content': ''}), 404
+                
+                with open(snippet_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                return jsonify({'success': True, 'content': content})
+                
+            except Exception as e:
+                print(f"Błąd wczytywania snippet: {str(e)}")
+                return jsonify({'success': False, 'content': ''}), 500
+
+        @self.flask_app.route('/api/prompt/<int:prompt_id>', methods=['GET'])
+        def get_prompt(prompt_id):
+            try:
+                import os
+                prompt_file = os.path.join('API_editor', f'Prompt{prompt_id}.txt')
+                
+                if not os.path.exists(prompt_file):
+                    return jsonify({'success': False, 'message': 'Plik promptu nie istnieje'}), 404
+                
+                with open(prompt_file, 'r', encoding='utf-8') as f:
+                    prompt_text = f.read()
+                
+                return jsonify({'success': True, 'prompt_text': prompt_text})
+                
+            except Exception as e:
+                print(f"Błąd wczytywania promptu: {str(e)}")
+                return jsonify({'success': False, 'message': str(e)}), 500
+
+        @self.flask_app.route('/api/reset-ai-session', methods=['POST'])
+        def reset_ai_session():
+            try:
+                from flask import request
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                session_id = data.get('sessionId', '')
+                if not session_id:
+                    return jsonify({'success': False, 'error': 'Brak ID sesji'}), 400
+                
+                success = self.reset_ai_session(session_id)
+                
+                return jsonify({
+                    'success': success,
+                    'message': 'Sesja zresetowana' if success else 'Sesja nie istnieje'
+                })
+                
+            except Exception as e:
+                print(f"Błąd resetowania sesji AI: {str(e)}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+
+        @self.flask_app.route('/api/edit-snippet', methods=['POST'])
+        def edit_snippet():
+            try:
+                from flask import request
+                import os
+                
+                data = request.get_json()
+                if not data:
+                    return jsonify({'success': False, 'error': 'Brak danych'}), 400
+                
+                prompt = data.get('prompt', '')
+                if not prompt:
+                    return jsonify({'success': False, 'error': 'Brak promptu'}), 400
+                
+                # Pobierz parametry sesji
+                remember_conversation = data.get('rememberConversation', False)
+                session_id = data.get('sessionId', None) if remember_conversation else None
+                
+                # Generuj odpowiedź używając wbudowanego Gemini API
+                new_content = self.generate_with_gemini(prompt, session_id, remember_conversation)
+                
+                if not new_content:
+                    return jsonify({'success': False, 'error': 'Błąd generowania odpowiedzi z Gemini API'}), 500
+                
+                # Nadpisz box1a.html
+                box1a_path = os.path.join('templates/presets', 'box1a.html')
+                
+                with open(box1a_path, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                
+                print(f"Zaktualizowano box1a.html przez API")
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Snippet zaktualizowany pomyślnie'
+                })
+                
+            except Exception as e:
+                print(f"Błąd edycji snippet: {str(e)}")
+                return jsonify({'success': False, 'error': str(e)}), 500
+
         @self.flask_app.route('/api/export-slide', methods=['POST'])
         def export_slide():
             try:

@@ -480,3 +480,88 @@ body {
     display: grid;
     place-items: center;
 }
+
+/* AI Panel */
+.ai-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(50, 50, 50, 0.95);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    width: 500px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.ai-panel h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.ai-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.prompt-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    align-self: flex-start;
+}
+
+.prompt-btn:hover {
+    background: #0056b3;
+}
+
+#aiPrompt {
+    width: 100%;
+    height: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 12px;
+}
+
+.ai-submit-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.ai-submit-btn:hover {
+    background: #1e7e34;
+}
+
+.ai-submit-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.ai-session-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.ai-session-controls label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
