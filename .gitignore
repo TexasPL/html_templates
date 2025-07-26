@@ -7,3 +7,6 @@ __pycache__/
 .env
 screenshot_*.png
 *.log
+
+# API keys configuration
+API_editor/config.json
